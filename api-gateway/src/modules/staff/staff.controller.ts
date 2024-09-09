@@ -1,0 +1,39 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { StaffService } from './staff.service';
+
+@Controller('staff')
+export class StaffController {
+  constructor(private readonly staffService: StaffService) {}
+
+  @Post()
+  create(@Body() body) {
+    try {
+      return this.staffService.create(body);
+
+    } catch (error) {
+      console.log(error.status);
+      
+      return error
+    }
+  }
+
+  @Get('all')
+  findAll() {
+    return this.staffService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.staffService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() body) {
+    return this.staffService.update(+id, body);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.staffService.remove(+id);
+  }
+}

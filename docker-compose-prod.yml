@@ -1,0 +1,18 @@
+version: '3.0'
+
+services:
+  identity:
+    container_name: identity
+    build: 
+      context: ./identity
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3001"
+    volumes:
+      - ./identity:/app
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    restart: on-failure
+    command: npm start
+    networks:
+      - erada

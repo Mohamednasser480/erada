@@ -1,0 +1,87 @@
+version: '3.8'
+services:
+  identity:
+    container_name: identity
+    image: erada/identity
+    build: 
+      context: ./identity
+      dockerfile: development.Dockerfile
+    volumes:
+      - ./identity:/app
+    env_file:
+      - ./environment.env
+    restart: on-failure
+    command: npm run start:dev
+    networks:
+      - erada_network
+   
+  api-gateway:
+    container_name: api-gateway
+    image: erada/api-gateway
+    build: 
+      context: ./api-gateway
+      dockerfile: development.Dockerfile
+   
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./api-gateway:/app
+    env_file:
+      - ./environment.env
+    restart: on-failure
+    command: npm run start:dev
+    networks:
+      - erada_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq_container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - erada_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    networks:
+      - erada_network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+    container_name: elasticsearch
+
+    environment:
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - node.name=elasticsearch
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - erada_network
+ 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.4.3
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200   
+
+networks:
+  erada_network:
+    driver: bridge
+
+
+
