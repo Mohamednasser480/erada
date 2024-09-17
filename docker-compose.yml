@@ -1,37 +1,67 @@
-version: '3.8'
+# version: '3.7'
 services:
   identity:
     container_name: identity
-    image: erada/identity
+    image: erada/identity:1.0.0
     build: 
       context: ./identity
       dockerfile: development.Dockerfile
-    volumes:
-      - ./identity:/app
     env_file:
       - ./environment.env
-    restart: on-failure
+    depends_on:
+            - postgres
     command: npm run start:dev
+
+    volumes:
+       - ./identity:/app
+       - /app/node_modules
     networks:
       - erada_network
+    restart: on-failure
+
+   # VAS -------------------------------------------------
+  vas:
+    container_name: vas
+    image: erada/vas:1.0.2
+    build: 
+      context: ./vas
+      dockerfile: development.Dockerfile
+    env_file:
+      - ./environment.env
+    depends_on:
+            - postgres
+    command: npm run start:dev
+
+    volumes:
+       - ./vas:/app
+       - /app/node_modules
+    networks:
+      - erada_network
+    restart: on-failure
+
    
+   #--------------------------------------------------
   api-gateway:
     container_name: api-gateway
-    image: erada/api-gateway
+    image: erada/api-gateway:1.0.5
     build: 
       context: ./api-gateway
       dockerfile: development.Dockerfile
-   
+
+    env_file:
+      - ./environment.env
+    depends_on:
+            - postgres
+    command: npm run start:dev
+    
     ports:
       - '3000:3000'
     volumes:
-      - ./api-gateway:/app
-    env_file:
-      - ./environment.env
-    restart: on-failure
-    command: npm run start:dev
+       - ./api-gateway:/app
+       - /app/node_modules
     networks:
       - erada_network
+    restart: on-failure
 
   rabbitmq:
     image: rabbitmq:management
@@ -39,49 +69,32 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq-user
+      RABBITMQ_DEFAULT_PASS: rabbitmq-password
+
     networks:
       - erada_network
 
   postgres:
     image: postgres:latest
     container_name: postgres_container
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./environment.env
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypass
-      POSTGRES_DB: mydb
-    ports:
-      - "5432:5432"
+    volumes:
+      - ./init-multi-postgres-databases.sh:/docker-entrypoint-initdb.d/init-multi-postgres-databases.sh
     networks:
       - erada_network
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
-    container_name: elasticsearch
-
-    environment:
-      - discovery.type=single-node
-      - cluster.name=docker-cluster
-      - node.name=elasticsearch
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    networks:
-      - erada_network
- 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.4.3
-    container_name: kibana
-    depends_on:
-      - elasticsearch
-    ports:
-      - "5601:5601"
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200   
-
+   
 networks:
   erada_network:
     driver: bridge
-
+volumes:
+ db:
 
 

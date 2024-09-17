@@ -27,6 +27,7 @@ export class Staff extends BaseEntityWithId implements IStaff {
     eager: true,
     nullable: true,
   })
+  
   @JoinColumn()
   role: string;
   @ManyToOne(() => Staff, (manager) => manager.employees, { nullable: true })
@@ -38,6 +39,8 @@ export class Staff extends BaseEntityWithId implements IStaff {
   // @ApiProperty({ description: 'refresh token' })
   // @Column({ type: 'varchar', default: null })
   // refreshToken: string;
+
+
 
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);

@@ -8,6 +8,12 @@ export enum FileValidationErrors {
 interface IBaseWithId extends IBase {
   id: string;
 }
+export interface IBranch {
+  branchId: string;
+  staffId: string;
+
+}
+
 export interface IBaseWithMeta extends IBaseWithId {
   createdBy?: string;
   updatedBy?: string;
