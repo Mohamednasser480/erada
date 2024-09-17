@@ -94,6 +94,13 @@ export class StuffController {
   ) {
     return this.staffService.findAll(query);
   }
+  @Get('/ids')
+  findAllBelongToBranch(
+    @Query('ids')
+    ids:string,
+  ) {
+    return this.staffService.findAllBelongToBranch(ids);
+  }
 
 //@UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id')

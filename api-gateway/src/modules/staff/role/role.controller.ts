@@ -16,7 +16,7 @@ export class RoleController {
   constructor(private readonly roleService: RoleService) {}
   @Post('/')
   
-  async create(
+  async create( @Body()
     data: any,
   ) {
     return await this.roleService.create(data);

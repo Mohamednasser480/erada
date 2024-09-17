@@ -9,22 +9,22 @@ import {
 } from 'typeorm';
 
 export abstract class BaseEntity {
- // @ApiProperty({ description: 'updated at ' })
+ @ApiProperty({ description: 'updated at ' })
   
-//   @UpdateDateColumn({
-//     type: 'timestamp',
+  @UpdateDateColumn({
+    type: 'timestamp',
     
-//     default: () => 'CURRENT_TIMESTAMP(6)',
-//     onUpdate: 'CURRENT_TIMESTAMP(6)'
-// })
-//   updatedAt: string;
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)'
+})
+  updatedAt: string;
 
-//   @ApiProperty({ description: 'created at ' })
-//   @CreateDateColumn({
-//     type: 'timestamp',
-//     default: () => 'CURRENT_TIMESTAMP(6)',
-// })
-// createdAt: string;
+  @ApiProperty({ description: 'created at ' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+})
+createdAt: string;
 }
 
 export abstract class BaseEntityWithId extends BaseEntity {

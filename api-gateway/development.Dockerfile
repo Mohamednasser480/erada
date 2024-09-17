@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18 AS development
 
 WORKDIR /app
 
@@ -7,9 +7,6 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-EXPOSE 80:3001
-
+EXPOSE 3000:3000
 RUN npm run build
 
-
-# RUN npm run migration:run

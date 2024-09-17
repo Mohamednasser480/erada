@@ -105,7 +105,31 @@ export class StaffService extends BaseService {
       return this._getInternalServerError(err.message);
     }
   }
+  async findAllBelongToBranch(ids: string) {
+    try {
+      let stafIids = ids.split(',').map(String);
 
+      console.log("stafIids",stafIids);
+      
+      return this.staffRepository.createQueryBuilder('staff')
+      .leftJoinAndSelect('staff.role', 'role')
+      .select([
+        'staff.id',
+        'staff.name',
+        'role.id',
+        'role.name',
+        'staff.staffId',
+        'staff.phone',
+        'staff.status',
+        'staff.createdAt',
+      ]).where('user.id IN (:...staffs)', { staffs: stafIids })
+      .getMany();
+    } catch (err) {
+      console.log("err",err);
+      
+      return this._getInternalServerError(err.message);
+    }
+  }
   /**
    * @param {object}
    * @returns {}
