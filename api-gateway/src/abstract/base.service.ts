@@ -28,8 +28,6 @@ export abstract class BaseService {
   
 
   protected customErrorHandle(error) {
-    console.log("error response",JSON.stringify(error));
-
     switch (error.name) {
       case 'HttpException':
         throw new HttpException(error.response, error.status);
