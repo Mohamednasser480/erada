@@ -35,4 +35,16 @@ export const RESPONSE_MESSAGES = {
     THIS_Employee_IS_ALREADY_EXIST: 'this Employee is already exist ',
     Employee_DELETED_SUCCESSFULLY: 'Employee deleted successfully',
   },
+  InsuranceCompany: {
+    CREATE_COMPANY: 'Creat company',
+    COMPANY_IS_ALREADY_EXIST: 'Company is already exist',
+    COMPANY_ID_IS_NOT_VALID: 'Company id is not valid ',
+    INSURANCE_COMPANY_UPDATED_SUCCESSFULLY: 'Insurance company updated successfully'
+  },
+  InsurancePolicy: {
+    INSURANCE_COMPANY_IS_NOT_EXIST: "Insurance company is not exist",
+    POLICY_IS_ALREADY_EXIST: "Policy name is already exist",
+    POLICY_ID_IS_NOT_VALID: 'Policy id is not valid ',
+    POLICY_UPDATED_SUCCESSFULLY: 'Policy updated successfully'
+  }
 };
