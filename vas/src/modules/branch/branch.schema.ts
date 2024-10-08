@@ -1,5 +1,6 @@
 import { IBranch } from '../../types';
 import * as yup from 'yup';
+const statusName = ['freezed', 'closed', 'active',];
 
 export const branchValidationSchema: {
   [key in keyof IBranch]?: yup.AnySchema;
@@ -10,7 +11,10 @@ export const branchValidationSchema: {
   managerId: yup.string().required().default(null),
   lat: yup.string().default('null'),
   len: yup.string().required().default('null'),
-  status: yup.boolean().required().default(true),
+  status: yup.string().required().default('active').oneOf(statusName),
+  street: yup.string().required().default('null'),
+  buildingNO: yup.string().required().default('null'),
+  landmark: yup.string().required().default('null'),
 
 
 
