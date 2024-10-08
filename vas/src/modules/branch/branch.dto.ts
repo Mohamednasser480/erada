@@ -6,12 +6,19 @@ export class BranchDto implements Partial<IBranch> {
   name: string;
 
   @IsBoolean()
-  status: boolean;
+  status: string;
 
   @IsString()
   managerId: string;
+  @IsString()
 
+  street?:string
+  @IsString()
 
+  buildingNO?:string
+  @IsString()
+
+  landmark?:string
  
   @IsString()
   gaverment:string;
