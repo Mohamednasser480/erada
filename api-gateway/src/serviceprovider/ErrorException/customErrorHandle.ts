@@ -24,6 +24,8 @@ export class CustomErrorHandle {
         //   });
         console.log("----------------------------------------------------");
 
+        console.log( error.response);
+
         console.log(error.response.status);
         
         switch (error.response.status) {

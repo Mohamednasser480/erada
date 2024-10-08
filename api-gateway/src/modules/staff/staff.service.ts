@@ -2,6 +2,7 @@ import { Body, Injectable } from '@nestjs/common';
 import CircuitBreaker from 'src/serviceprovider/CircuitBreaker';
 import { BaseService } from 'src/abstract';
 import { CustomErrorHandle } from 'src/serviceprovider/ErrorException/customErrorHandle';
+import objectToQueryString from 'src/helpers/objectToQueryString';
 
 @Injectable()
 export class StaffService extends BaseService {
@@ -29,19 +30,59 @@ export class StaffService extends BaseService {
 
   }
 
-  findAll() {
-    return `This action returns all staff`;
+   async findAll(data): Promise< any > {
+    try {
+      let query:string=objectToQueryString(data)
+      const request = {
+        method: 'get',
+        url: `${this.IDENTITY_URL}/staff/all${query}`,
+        data: {},
+      };
+         
+        return await  this.circuitBreaker.send(request)
+
+    } catch (error) {
+
+      console.log("error",error);
+      CustomErrorHandle.customErrorHandle(error)
+    }
+  
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staff`;
-  }
+   async   getAllEmployeesUnderManager(id: string) {
+      try {
+        const request = {
+          method: 'get',
+          url: `${this.IDENTITY_URL}/staff/reported/${id}`,
+          data: {},
+        };
+           
+          return await  this.circuitBreaker.send(request)
+  
+      } catch (error) {
+  
+        console.log("error",error);
+        CustomErrorHandle.customErrorHandle(error)
+      }  }
 
-  update(id: number,  body:any ) {
-    return `This action updates a #${id} staff`;
-  }
+  async update(id: string,  body:any ): Promise< any > { 
+    try {
+      const request = {
+        method: 'patch',
+        url: `${this.IDENTITY_URL}/staff/${id}`,
+        data: body,
+      };
+         
+        return await  this.circuitBreaker.send(request)
 
-  remove(id: number) {
+    } catch (error) {
+
+      console.log("error",error);
+      CustomErrorHandle.customErrorHandle(error)
+    }
+    }
+
+  remove(id: String) {
     return `This action removes a #${id} staff`;
   }
 }

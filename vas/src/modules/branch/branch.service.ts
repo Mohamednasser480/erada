@@ -171,12 +171,9 @@ export class BranchService extends BaseService {
           name: string;
           status: string;
           gaverment: string;
-          area: string;
-        }>(sort); //check if param is one of keys status,gaverment,area
+          area: string;        }>(sort); //check if param is one of keys
+
         if (allowedFieldsToSort.includes(param[0])) {
-          if (param[0] === 'name') {
-            qr.orderBy(`branch.${param[0]}`, param[1]);
-          }
           if (param[0] === 'status') {
             qr.orderBy(`branch.${param[0]}`, param[1]);
           } if (param[0] === 'gaverment') {

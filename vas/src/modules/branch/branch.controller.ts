@@ -93,7 +93,7 @@ export class BranchController {
   // delete API
    
   @Delete('delete/:id')
-delete(@Param('id') id: string) {
+   delete(@Param('id') id: string) {
     return this.branchService.delete(id);
   }
 }

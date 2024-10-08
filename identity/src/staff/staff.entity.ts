@@ -1,10 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseEntityWithId } from '../abstract';
 import { IStaff } from 'src/types';
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, JoinColumn, OneToMany, TreeParent, TreeChildren, Tree } from 'typeorm';
 import { Role } from 'src/role/role.entity';
 import * as bcrypt from 'bcrypt';
+import { Branch } from './branch/branch.entity';
+
 @Entity()
+@Tree("nested-set")
+
 export class Staff extends BaseEntityWithId implements IStaff {
   @ApiProperty({ description: 'name' })
   @Column({ type: 'varchar', length: 100, nullable: false })
@@ -36,10 +40,13 @@ export class Staff extends BaseEntityWithId implements IStaff {
   @OneToMany(() => Staff, (employee) => employee.manager)
   employees: Staff[];
 
+  @OneToMany(() => Branch, (branch) => branch.staff, { nullable: true })
+  
+  branchs: string[];
+
   // @ApiProperty({ description: 'refresh token' })
   // @Column({ type: 'varchar', default: null })
   // refreshToken: string;
-
 
 
   async validatePassword(password: string): Promise<boolean> {

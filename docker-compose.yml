@@ -21,7 +21,7 @@ services:
    # VAS -------------------------------------------------
   vas:
     container_name: vas
-    image: erada/vas:1.0.2
+    image: erada/vas
     build: 
       context: ./vas
       dockerfile: development.Dockerfile
@@ -61,18 +61,20 @@ services:
     networks:
       - erada_network
     restart: on-failure
-  rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq_container
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq-user
-      RABBITMQ_DEFAULT_PASS: rabbitmq-password
 
-    networks:
-      - erada_network
+  # rabbitmq:
+  #   image: rabbitmq:management
+  #   container_name: rabbitmq_container
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: rabbitmq-user
+  #     RABBITMQ_DEFAULT_PASS: rabbitmq-password
+
+  #   networks:
+  #     - erada_network
+
   postgres:
     image: postgres:latest
     container_name: postgres_container
@@ -87,6 +89,8 @@ services:
       - ./init-multi-postgres-databases.sh:/docker-entrypoint-initdb.d/init-multi-postgres-databases.sh
     networks:
       - erada_network
+    restart: always
+
    
 networks:
   erada_network:

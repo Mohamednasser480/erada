@@ -1,19 +1,23 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository,TreeRepository,getConnection } from 'typeorm';
 import { Staff } from './staff.entity';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { BaseService } from '../abstract';
-import { IStaff } from '../types';
+import { IBranch, IStaff } from '../types';
 import * as bcrypt from 'bcrypt';
 import { RESPONSE_MESSAGES } from '../types/responseMessages';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-export const allowedFieldsToSort = ['phone', 'status', 'name'];
+import { Branch } from './branch/branch.entity';
+import { StaffUtil } from './staff-util';
+export const allowedFieldsToSort = ['phone', 'status', 'name','branchId'];
 @Injectable({ scope: Scope.REQUEST })
 export class StaffService extends BaseService {
   constructor(
     @InjectRepository(Staff)
-    private readonly staffRepository: Repository<Staff>,
+    private readonly staffRepository: TreeRepository<Staff>,
+    @InjectRepository(Branch)
+    private readonly branchRepository: Repository<Branch>,
     @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {
     super();
@@ -24,16 +28,13 @@ export class StaffService extends BaseService {
    * @description :This function is used to create staff
    */
   async create(data: Partial<IStaff>) {
-    const { staffId, password } = data;
+    const { staffId, password,branchs } = data;
     console.log("data",data);
 
     try {
       const IsExist = await this.find({ staffId: staffId });
       console.log("IsExist",IsExist);
-      if (IsExist) {
-        console.log("IsExist is mean NUll = true",IsExist);
-        
-      }
+   
       if (IsExist) {
         console.log("IsExist",IsExist);
         
@@ -46,9 +47,27 @@ export class StaffService extends BaseService {
       const hashedPassword = await bcrypt.hash(password, salt);
       data.password = hashedPassword;
       console.log("data 2 ",data);
+      const creatStaff =  this.staffRepository.create(data);
 
+      const saved = await this.staffRepository.save(creatStaff);
       
-      const saved = await this.staffRepository.save(data);
+      
+      if (branchs) {
+        console.log("saved 2 ",saved);
+
+       let instertion:IBranch[]=[]
+        for (const branch of branchs) {
+          if (saved.id !==null) {
+            console.log(branch);
+            
+            instertion.push({staff:saved,branchId:branch})
+          }
+        }
+         const branchsResult =  await this.branchRepository.save(instertion);
+      
+      }
+     
+         
       //send SMS to staff //
       const mailDetails = {
         from: process.env.SYSTEM_SMS,
@@ -58,6 +77,7 @@ export class StaffService extends BaseService {
       };
     //  await this.sendMail(mailDetails);
       delete saved?.password;
+      saved.branchs=branchs
       return saved;
     } catch (error) {
       console.log(error);
@@ -78,11 +98,61 @@ export class StaffService extends BaseService {
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.STAFF.STAFF_ID_NOT_VALID);
       }
-      data.id = id;
-      const staff = await this.staffRepository.preload(data);
-      const saved = await this.staffRepository.save(staff);
-      return saved;
-    } catch (error) {
+      // data.id = id;
+      console.log("IsExist",data.branchs);
+      const {branchs} =data
+      delete data.branchs
+      console.log("data",data);
+
+      let result = await this.staffRepository.update(id,data );
+      console.log("result",result);
+      
+
+      if (branchs) {
+        console.log("branchs",branchs);
+        
+        let instertion:IBranch[]=[]
+         for (const branch of branchs) {
+           if (result.affected) {
+             console.log(branch);
+             
+             instertion.push({staff:id,branchId:branch})
+           }
+         }
+         console.log("instertion branchs",instertion);
+
+      //   const connection = getConnection();
+         console.log("---------127-------");
+         
+       //  await connection.transaction(async transactionalEntityManager => {
+          //   const branchRepository =  transactionalEntityManager.getRepository(Branch);
+             console.log("---------131-------");
+
+        // Find all data by staff
+        const branchsToDelete = await this.branchRepository.find({ where: { staff:{'id':id } }});
+                     console.log("---------135-------");
+
+        console.log("branchsToDelete",branchsToDelete);
+         
+
+         // Delete the found data
+        await this.branchRepository.remove(branchsToDelete);
+
+        // // Insert new data
+    
+        await this.branchRepository.save(instertion);
+      
+       
+    //  });
+       
+       }
+       if (result.affected > 0) {
+        return {
+          message: RESPONSE_MESSAGES.STAFF.STAFF_UPDATED_SUCCESSFULLY,
+        };
+      // return result;
+    }
+   } catch (error) {
       this.customErrorHandle(error);
     }
   }
@@ -105,32 +175,56 @@ export class StaffService extends BaseService {
       return this._getInternalServerError(err.message);
     }
   }
-  async findAllBelongToBranch(ids: string) {
-    try {
-      let stafIids = ids.split(',').map(String);
 
-      console.log("stafIids",stafIids);
+
+ /**
+   
+   * @returns {dataObject}
+   * @description :This function is used to update staff
+   */
+  async assiginTobranch (data){
+
+    try{
+      const {staffId:staff,branchId}=data
+      console.log(data);
       
-      return this.staffRepository.createQueryBuilder('staff')
-      .leftJoinAndSelect('staff.role', 'role')
-      .select([
-        'staff.id',
-        'staff.name',
-        'role.id',
-        'role.name',
-        'staff.staffId',
-        'staff.phone',
-        'staff.status',
-        'staff.createdAt',
-      ]).where('user.id IN (:...staffs)', { staffs: stafIids })
-      .getMany();
-    } catch (err) {
-      console.log("err",err);
+      const IsExist = await this.find({ id: staff });
+      console.log("IsExist",IsExist);
+   
+      if (!IsExist) {
+        
+        return this._getNotFoundError(
+          RESPONSE_MESSAGES.STAFF.Staff_ID_IS_ALREADY_EXIST,
+        );
+      }
+      console.log("staffId",staff);
       
-      return this._getInternalServerError(err.message);
-    }
+   const branchstaff = await this.branchRepository.findOne({ where: { staff:{'id':staff }, branchId }});
+    console.log("branchstaff",branchstaff);
+    
+   if (branchstaff) {
+    return branchstaff
+
+   }
+// // Insert new data
+
+let result =await  this.branchRepository.save({staff,branchId});
+console.log(result);
+
+
+if (result) {
+return {
+message: RESPONSE_MESSAGES.STAFF.UPDATE_STAFF_BY_ID,
+};
+// return result;
+}
+} catch (error) {
+this.customErrorHandle(error);
+}
+
+
   }
-  /**
+    /**
    * @param {object}
    * @returns {}
    * @description : This function is used to check staff  already Exist or not with object data
@@ -187,9 +281,12 @@ export class StaffService extends BaseService {
    */
   async findAll(data: any) {
     try {
-      const { search, sort, phone } = data;
+      
+      const { search, sort, phone,branchId } = data;
       const qr = this.staffRepository.createQueryBuilder('staff');
       qr.leftJoinAndSelect('staff.role', 'role');
+      qr.leftJoin('staff.branchs', 'branchs');
+
       qr.select([
         'staff.id',
         'staff.name',
@@ -198,6 +295,8 @@ export class StaffService extends BaseService {
         'staff.staffId',
         'staff.phone',
         'staff.status',
+         'branchs'
+      
       ]);
       if (sort) {
         const param = this.buildSortParams<{
@@ -218,6 +317,13 @@ export class StaffService extends BaseService {
         qr.andWhere('staff.phone LIKE :phone', {
           phone: '%' + phone + '%',
         });
+      } 
+        if (branchId) {
+                // qr.where('role.id =:id', { id: roleId });
+
+        qr.andWhere('branchs.branchId LIKE :branchId', {
+          branchId: '%' + branchId + '%',
+        });
       }
       if (search) {
         qr.andWhere(
@@ -232,6 +338,8 @@ export class StaffService extends BaseService {
         page: data.page || 1,
       });
     } catch (err) {
+      console.log(err);
+      
       this._getInternalServerError(err.message);
     }
   }
@@ -252,27 +360,16 @@ export class StaffService extends BaseService {
 
   async  getAllEmployeesUnderManager(managerId: string): Promise<any> {
 
-    // Get direct reports of the manager
-    const directReports = await this.staffRepository.find({
-        where: { manager: {id: String( managerId )} },
-        relations: ['employees'], // Load the employees relation
-    });
-
-    // Initialize an array to hold all employees
-    let allEmployees: any = [];
-
-    // Recursive function to gather all employees
-    const gatherEmployees = (employees: any[]) => {
-        for (const employee of employees) {
-            allEmployees.push(employee); // Add the employee to the list
-            gatherEmployees(employee.employees); // Recursively gather their direct reports
+    const manager = await this.staffRepository.findOne({ where: { id: managerId } });
+        if (!manager) {
+            throw new Error(`Manager with ID ${managerId} not found.`);
         }
-    };
+console.log(manager);
 
-    // Start the gathering process
-    gatherEmployees(directReports);
-
-    return allEmployees;
+        // Use TypeORM's built-in tree functionality
+        let employees = await this.staffRepository.findDescendantsTree( manager, { relations: ['employees']});
+         let employeesTree:Staff[] =  StaffUtil.employeeTree(employees)
+        return employeesTree;
 }
 
 

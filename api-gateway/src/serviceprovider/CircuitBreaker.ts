@@ -86,7 +86,8 @@ class CircuitBreaker {
  
       return this.success(response);
     } catch (err: any) {
-
+      console.log("89-> err", err);
+      
       return this.failure(err);
 
     }

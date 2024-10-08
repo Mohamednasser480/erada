@@ -1,17 +1,22 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { BranchController } from './branch.controller';
+import { forwardRef, Module } from '@nestjs/common';
 import { BranchService } from './branch.service';
-import { Branch } from './branch.entity';
+import { BranchController } from './branch.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Branch } from './branch.entity';
+import { StaffModule } from '../staff.module';
 
 @Module({
-  imports: [
+  imports:[
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([Branch]),
+    forwardRef(() => StaffModule),
+
   ],
   controllers: [BranchController],
   providers: [BranchService],
-  exports: [BranchService],
+  exports: [BranchService
+
+  ],
 })
 export class BranchModule {}

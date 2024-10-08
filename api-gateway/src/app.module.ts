@@ -23,9 +23,7 @@ console.log( process.env.IDENTITY_HOST);
     ActionModule,
     BranchModule,
     InsuranceCompanyModule,
-    InsurancePolicyModule
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+    InsurancePolicyModule,
+  ]
 })
 export class AppModule {}

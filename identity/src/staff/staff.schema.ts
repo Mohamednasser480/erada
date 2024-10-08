@@ -12,13 +12,15 @@ export const staffValidationSchema: {
     .max(13)
     .required('Phone must not more then 13 characters'),
   status: yup.boolean().default(true),
-  // role: yup.string().required('Role is required'),
+  role: yup.string(),
+  branchs: yup.array()
+    
 };
 
 export const findValidationSchema: {
   [key in keyof IStaff]?: yup.AnySchema;
 } = {
-  name: yup.string().trim(),
+  id: yup.string().trim(),
   staffId: yup.string().trim(),
   phone: yup.string().trim(),
 };

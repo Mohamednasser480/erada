@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
@@ -6,7 +7,7 @@ import { StaffModule } from './staff/staff.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import database from './config/database.config';
+import {database} from './config/database.config';
 import { join } from 'path';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { RoleModule } from './role/role.module';
@@ -43,4 +44,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
 })
-export class AppModule {}
+export class AppModule {
+  
+}
