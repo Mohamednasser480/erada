@@ -67,7 +67,7 @@ export class StuffController {
       new UuIdValidationPipe({ id: RESPONSE_MESSAGES.STAFF.STAFF_ID_NOT_VALID }),
     )
     id: string,
-    @Body()
+    @Body(new YupValidationPipe(getValidationSchema(staffValidationSchema)))
     data: StaffDto,
   ) {
     return this.staffService.update(id, data);
@@ -94,17 +94,13 @@ export class StuffController {
   ) {
     return this.staffService.findAll(query);
   }
-  @Post('assigin-to-branch')
-
-  assiginTobranch(
-    @Body()
-    data,
+  @Get('/ids')
+  findAllBelongToBranch(
+    @Query('ids')
+    ids:string,
   ) {
-    return this.staffService.assiginTobranch(data);
+    return this.staffService.findAllBelongToBranch(ids);
   }
-
-
-
 
 //@UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id')

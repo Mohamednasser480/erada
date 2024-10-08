@@ -1,4 +1,3 @@
-
 interface IBase {
   createdAt?: any;
   updatedAt?: any;
@@ -11,7 +10,7 @@ interface IBaseWithId extends IBase {
 }
 export interface IBranch {
   branchId: string;
-  staff: any;
+  staffId: string;
 
 }
 
@@ -26,9 +25,8 @@ export interface IStaff extends IBaseWithId {
   phone: number;
   status: boolean;
   refreshToken?: string;
-  manager?: any;
+  managerId?: string;
   role: string;
-  branchs?: string[];
   oldPassword?: string;
   newPassword?: string;
 }

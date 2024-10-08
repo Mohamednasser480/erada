@@ -7,8 +7,9 @@ import { IBranch } from '../../types';
 import { RESPONSE_MESSAGES } from '../../types/responseMessages';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { Employee } from './employee.entity';
 import CircuitBreaker from 'src/utils/CircuitBreaker';
-export const allowedFieldsToSort = ['name','status','gaverment','area'];
+export const allowedFieldsToSort = ['name'];
 const AllowParams = Object.freeze({
   SLUG: 'branch', // add sidebar slug here
   ADD: 'add', // add actions here
@@ -25,6 +26,8 @@ export class BranchService extends BaseService {
   constructor(
     @InjectRepository(Branch)
     private readonly branchRepository: Repository<Branch>,
+    @InjectRepository(Employee)
+    private readonly branchStaffRepository: Repository<Employee>,
     @Inject(REQUEST) private readonly request: Request,
   ) {
     super();
@@ -47,27 +50,9 @@ export class BranchService extends BaseService {
           RESPONSE_MESSAGES.Branch.Branch_IS_ALREADY_EXIST,
         );
       }
-    
-      const created = await this.branchRepository.create(data);
-  
-      
+      const created = this.branchRepository.create(data);
       let  result= await this.branchRepository.save(created);
-      //  if(result){
-      //   let branchAssign={
-      //     staffId:data.managerId,
-      //     branchId:result.id
-      //   }
-      //   console.log("created",created);
-        
-      //   const request = {
-      //     method: 'post',
-      //     url: `${this.IDENTITY_URL}/branch/`,
-      //     data: branchAssign,
-      //   };
-        
-      //   await  this.circuitBreaker.send(request)
-
-      // }
+         await   this.branchStaffRepository.save({branch:result,staffId:data.managerId})
        return result ;
     } catch (error) {
       this._getBadRequestError(error.message);
@@ -162,55 +147,27 @@ export class BranchService extends BaseService {
    */
   async findAll(data: any) {
     try {
-      const { search, name, sort,status,gaverment,area } = data;
-      const qr = this.branchRepository.createQueryBuilder('branch');
-      qr.select(['branch.id', 'branch.name', 'branch.status']) ;
+      const { search, branch, sort } = data;
+      const qr = this.branchRepository.createQueryBuilder('branch').leftJoinAndSelect('branch.staffs', 'staffs');
+      qr.select(['branch.id', 'branch.name', 'branch.status','staffs']) ;
 
       if (sort) {
         const param = this.buildSortParams<{
           name: string;
-          status: string;
-          gaverment: string;
-          area: string;
-        }>(sort); //check if param is one of keys status,gaverment,area
+        }>(sort); //check if param is one of keys
         if (allowedFieldsToSort.includes(param[0])) {
           if (param[0] === 'name') {
             qr.orderBy(`branch.${param[0]}`, param[1]);
           }
-          if (param[0] === 'status') {
-            qr.orderBy(`branch.${param[0]}`, param[1]);
-          } if (param[0] === 'gaverment') {
-            qr.orderBy(`branch.${param[0]}`, param[1]);
-          } if (param[0] === 'area') {
-            qr.orderBy(`branch.${param[0]}`, param[1]);
-         
         }
-      }
-     } else {
+      } else {
         qr.orderBy('branch.createdAt', 'ASC');
       }
-      if (name) {
-        qr.andWhere('branch.name LIKE :name', {
-          name: '%' + name + '%',
+      if (branch) {
+        qr.andWhere('branch.name LIKE :branch', {
+          branch: '%' + branch + '%',
         });
       }
-      if (status) {
-        qr.andWhere('branch.status LIKE :status', {
-          status: '%' + status + '%',
-        });
-      }
-
-      if (gaverment) {
-        qr.andWhere('branch.gaverment LIKE :gaverment', {
-          gaverment: '%' + gaverment + '%',
-        });
-      } if (area) {
-        qr.andWhere('branch.area LIKE :area', {
-          area: '%' + area + '%',
-        });
-      }
-
-
       if (search) {
         qr.andWhere('branch.name LIKE :search', {
           search: '%' + search + '%',
@@ -242,10 +199,30 @@ export class BranchService extends BaseService {
         let result = await this.branchRepository.findOne({
         where: {
           id: id,
-        }
+        },
+        relations:["staffs"]
       });
-    
+      let ids=[]
+      for (const element of result.staffs) {
+
+         ids.push(element.staffId)
+      }
       
+
+      const request = {
+        method: 'get',
+        url: `${this.IDENTITY_URL}/staff/ids/?ids=${ids.join(',')}`,
+        data: {},
+      };
+         
+      const  staffs= await  this.circuitBreaker.send(request)
+
+           if (!staffs.data) {
+            result.staffs=[]
+            return result
+           }
+
+           result.staffs
            return result
       
     } catch (err) {

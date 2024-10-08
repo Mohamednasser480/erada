@@ -19,15 +19,12 @@ export interface IBranch extends IBaseWithMeta{
 
   managerId: string;
 
-  status:string;
+  status:boolean;
   name:string;
   gaverment:string;
   area:string;
   len?:string;
   lat?:string
-  street?:string
-  buildingNO?:string
-  landmark?:string
   staffs?:any
 }
 
@@ -38,7 +35,22 @@ export interface IEmployee extends IBaseWithId{
   staffId:string
 }
 
+export interface IInsuranceCompany extends IBaseWithMeta {
+  name: string;
+  bankName: string;
+  accountNumber: string;
+  eradaAccountNumber: string;
+  status: boolean;
+  policiesCount: number;
+}
 
+export interface IInsurancePolicy extends IBaseWithMeta {
+  insuranceCompanyId: string;
+  name: string;
+  amount: number;
+  startDate: Date;
+  endDate: Date;
+}
 
 
 

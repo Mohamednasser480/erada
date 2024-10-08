@@ -20,8 +20,6 @@ export const RESPONSE_MESSAGES = {
     GET_STAFF_DETAILS: 'Get STAFF details',
     INVALID_STAFF_NAME_OR_PASSWORD: 'Invalid staffId or Password',
     INVALID_PASSWORD: 'Invalid password ',
-    STAFF_UPDATED_SUCCESSFULLY: 'Staff updated successfully!',
-
   },
   SIDEBAR: {
     SIDEBAR_IS_ALREADY_EXIST: 'Already Exist this record',

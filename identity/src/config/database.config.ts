@@ -1,6 +1,5 @@
 import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
-import path from 'path';
 import { DataSource, DataSourceOptions } from "typeorm";
 
 dotenvConfig({ path: '.env' });
@@ -27,27 +26,16 @@ console.log( __dirname);
     synchronize: process.env.TYPE_ORM_SYNC === 'ON', //process.env.NODE_ENV === 'development',
    
     logger: 'advanced-console',
-    migrationsTableName: 'migration_table',
-    migrationsRun: true,
+    migrationsTableName: 'migrations_typeorm', 
+    migrationsRun: false,
      entities: ["dist/**/*.entity{.ts,.js}"],
-    migrations: [ "./src/**/migrations/**/*.{js,ts}"],
-    seeds: ["dist/**/*.seed{.ts,.js}"],
-    cli: {
-      // Location of migration should be inside src folder
-      // to be compiled into dist/ folder.
-      // entitiesDir: process.env.TYPEORM_ENTITIES_DIR,
-      migrationsDir: './src/database/migrations',
-      // subscribersDir: process.env.TYPEORM_SUBSCRIBERS_DIR,
-    },
+    migrations: ["dist/**/migrations/*{.ts,.js}"],
     autoLoadEntities: true,
     logging: false, 
   
   };
 
-  console.log(config);
-  
-
-export const database= registerAs('database', () => config)
-export default   new DataSource(config as DataSourceOptions);
+export default registerAs('database', () => config)
+export const connectionSource = new DataSource(config as DataSourceOptions);
  
 

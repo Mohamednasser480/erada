@@ -4,11 +4,12 @@ import { BranchService } from './branch.service';
 import { Branch } from './branch.entity';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Employee } from './employee.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([Branch]),
+    TypeOrmModule.forFeature([Branch,Employee]),
   ],
   controllers: [BranchController],
   providers: [BranchService],
