@@ -9,6 +9,8 @@ export class StaffService extends BaseService {
   private  circuitBreaker = new CircuitBreaker(5, 2, 5000);
   private IDENTITY_URL:string=`http://${ process.env.IDENTITY_HOST}:${ process.env.IDENTITY_PORT}`
 
+
+
    async create(body: Body): Promise< any > {
     console.log(body);
     
@@ -36,6 +38,23 @@ export class StaffService extends BaseService {
       const request = {
         method: 'get',
         url: `${this.IDENTITY_URL}/staff/all${query}`,
+        data: {},
+      };
+         
+        return await  this.circuitBreaker.send(request)
+
+    } catch (error) {
+
+      console.log("error",error);
+      CustomErrorHandle.customErrorHandle(error)
+    }
+  
+  }
+  async findOne(id:string): Promise< any > {
+    try {
+      const request = {
+        method: 'get',
+        url: `${this.IDENTITY_URL}/staff/${id}`,
         data: {},
       };
          
