@@ -9,6 +9,8 @@ import { RoleModule } from './modules/staff/role/role.module';
 import { PermissionModule } from './modules/staff/permission/permission.module';
 import { ActionModule } from './modules/staff/action/action.module';
 import { BranchModule } from './modules/VAS/branch/branch.module';
+import {InsuranceCompanyModule} from "./modules/VAS/insuranceCompany/insuranceCompany.module";
+import {InsurancePolicyModule} from "./modules/VAS/insurancePolicy/insurancePolicy.module";
 
 dotenvConfig({ path: '.env' });
 console.log( process.env.IDENTITY_HOST); 
@@ -19,7 +21,9 @@ console.log( process.env.IDENTITY_HOST);
     RoleModule,
     PermissionModule,
     ActionModule,
-    BranchModule
+    BranchModule,
+    InsuranceCompanyModule,
+    InsurancePolicyModule
   ],
   controllers: [AppController],
   providers: [AppService],

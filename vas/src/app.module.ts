@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from './config/database.config';
 import { BranchModule } from './modules/branch/branch.module';
+import { InsuranceCompanyModule } from './modules/insuranceCompany/insuranceCompany.module';
+import { InsurancePolicyModule } from './modules/insurancePolicy/insurancePolicy.module';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { BranchModule } from './modules/branch/branch.module';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => (configService.get('database'))
     }),
- BranchModule
+ BranchModule,
+ InsuranceCompanyModule,
+ InsurancePolicyModule
   ],
   controllers: [AppController],
   providers: [AppService],
