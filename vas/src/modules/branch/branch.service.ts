@@ -164,7 +164,9 @@ export class BranchService extends BaseService {
     try {
       const { search, name, sort,status,gaverment,area } = data;
       const qr = this.branchRepository.createQueryBuilder('branch');
-      qr.select(['branch.id', 'branch.name', 'branch.status']) ;
+      qr.select(['branch.id', 'branch.name', 'branch.status','branch.buildingNO','branch.managerId','branch.gaverment','branch.aree'
+        ,'branch.lat','branch.len','branch.street','branch.city','branch.landmark','branch.updatedAt','branch.createdAt'
+       ]) ;
 
       if (sort) {
         const param = this.buildSortParams<{
