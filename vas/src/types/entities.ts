@@ -29,6 +29,7 @@ export interface IBranch extends IBaseWithMeta{
   buildingNO?:string
   landmark?:string
   staffs?:any
+  city?:any
 }
 
 export interface IEmployee extends IBaseWithId{

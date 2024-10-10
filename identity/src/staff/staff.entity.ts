@@ -34,6 +34,7 @@ export class Staff extends BaseEntityWithId implements IStaff {
   
   @JoinColumn()
   role: string;
+  
   @ManyToOne(() => Staff, (manager) => manager.employees, { nullable: true })
   manager: Staff;
 

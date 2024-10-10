@@ -15,6 +15,7 @@ export const branchValidationSchema: {
   street: yup.string().required().default('null'),
   buildingNO: yup.string().required().default('null'),
   landmark: yup.string().required().default('null'),
+  city: yup.string().required().default('null')
 
 
 

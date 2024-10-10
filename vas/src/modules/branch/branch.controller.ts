@@ -43,7 +43,7 @@ export class BranchController {
       new UuIdValidationPipe({ id: RESPONSE_MESSAGES.COMMON.VALIDATION_ERROR }),
     )
     id: string,
-    @Body(new YupValidationPipe(getValidationSchema(branchValidationSchema)))
+    @Body()
     data: Branch,
   ) {
     return this.branchService.update(id, data);

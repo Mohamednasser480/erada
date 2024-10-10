@@ -47,9 +47,9 @@ export class StaffService extends BaseService {
       const hashedPassword = await bcrypt.hash(password, salt);
       data.password = hashedPassword;
       console.log("data 2 ",data);
-      const creatStaff =  this.staffRepository.create(data);
+      const creatStaff = await  this.staffRepository.create(data);
 
-      const saved = await this.staffRepository.save(creatStaff);
+      const saved = await this.staffRepository.insert(creatStaff);
       
       
       if (branchs) {
