@@ -1,15 +1,16 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository,TreeRepository,getConnection } from 'typeorm';
-import { Staff } from './staff.entity';
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { BaseService } from '../abstract';
-import { IBranch, IStaff } from '../types';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository, TreeRepository} from 'typeorm';
+import {Staff} from './staff.entity';
+import {Inject, Injectable, Scope} from '@nestjs/common';
+import {BaseService} from '../abstract';
+import {IBranch, IStaff} from '../types';
 import * as bcrypt from 'bcrypt';
-import { RESPONSE_MESSAGES } from '../types/responseMessages';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { Branch } from './branch/branch.entity';
-import { StaffUtil } from './staff-util';
+import {RESPONSE_MESSAGES} from '../types/responseMessages';
+import {CACHE_MANAGER} from '@nestjs/cache-manager';
+import {Cache} from 'cache-manager';
+import {Branch} from './branch/branch.entity';
+import {StaffUtil} from './staff-util';
+
 export const allowedFieldsToSort = ['phone', 'status', 'name','branchId'];
 @Injectable({ scope: Scope.REQUEST })
 export class StaffService extends BaseService {
@@ -22,52 +23,30 @@ export class StaffService extends BaseService {
   ) {
     super();
   }
-  /**
-   * @param id
-   * @returns {dataObject}
-   * @description :This function is used to create staff
-   */
+
   async create(data: Partial<IStaff>) {
     const { staffId, password,branchs } = data;
-    console.log("data",data);
-
     try {
       const IsExist = await this.find({ staffId: staffId });
-      console.log("IsExist",IsExist);
-   
       if (IsExist) {
-        console.log("IsExist",IsExist);
-        
         return this._getNotFoundError(
           RESPONSE_MESSAGES.STAFF.Staff_ID_IS_ALREADY_EXIST,
         );
       }
-      // create password //
       const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(password, salt);
-      data.password = hashedPassword;
-      console.log("data 2 ",data);
-      const creatStaff = await  this.staffRepository.create(data);
-
-      const saved = await this.staffRepository.insert(creatStaff);
-      
-      
+      data.password = await bcrypt.hash(password, salt);
+      const creatStaff = this.staffRepository.create(data);
+      let saved: any = await this.staffRepository.insert(creatStaff);
+      saved = saved.identifiers[0];
       if (branchs) {
-        console.log("saved 2 ",saved);
-
-       let instertion:IBranch[]=[]
+       let insertion:IBranch[]=[];
         for (const branch of branchs) {
-          if (saved.id !==null) {
-            console.log(branch);
-            
-            instertion.push({staff:saved,branchId:branch})
+          if (saved.id !== null) {
+            insertion.push({staff:saved.id,branchId:branch})
           }
         }
-         const branchsResult =  await this.branchRepository.save(instertion);
-      
+         await this.branchRepository.save(insertion);
       }
-     
-         
       //send SMS to staff //
       const mailDetails = {
         from: process.env.SYSTEM_SMS,
@@ -75,13 +54,11 @@ export class StaffService extends BaseService {
         subject: 'Login Details',
         html: `<span> Your staffId :${staffId} <br> Your Password is: ${password}  <br> Please don't share with any one your Details </span>`,
       };
-    //  await this.sendMail(mailDetails);
       delete saved?.password;
       saved.branchs=branchs
       return saved;
     } catch (error) {
       console.log(error);
-      
       this.customErrorHandle(error);
     }
   }
@@ -296,7 +273,6 @@ this.customErrorHandle(error);
         'staff.phone',
         'staff.status',
          'branchs'
-      
       ]);
       if (sort) {
         const param = this.buildSortParams<{
@@ -319,8 +295,6 @@ this.customErrorHandle(error);
         });
       } 
         if (branchId) {
-                // qr.where('role.id =:id', { id: roleId });
-
         qr.andWhere('branchs.branchId LIKE :branchId', {
           branchId: '%' + branchId + '%',
         });

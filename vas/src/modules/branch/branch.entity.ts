@@ -1,4 +1,3 @@
-import { IBranch } from '../../types';
 import { Column, Entity, OneToMany, JoinColumn, DeleteDateColumn } from 'typeorm';
 import { BaseEntityWithId, BaseEntityWithMeta } from '../../abstract';
 
@@ -6,6 +5,7 @@ import { BaseEntityWithId, BaseEntityWithMeta } from '../../abstract';
 export class Branch extends BaseEntityWithId {
   @Column({ type: 'varchar', length: 100})
   name: string;
+
   @Column({ type: 'varchar', default: "active",length: 15 })
   status: string;
 
@@ -16,21 +16,26 @@ export class Branch extends BaseEntityWithId {
   area: string;
 
   @Column({ type: 'varchar',length: 100 })
-  gaverment: string;
+  government: string;
 
   @Column({ type: 'varchar',length: 100 , default: null })
   lat: string;
+
   @Column({ type: 'varchar',length: 100,default: null  })
   len: string;
 
   @Column({ type: 'varchar',length: 100,default: null  })
   street: string;
+
   @Column({ type: 'varchar',length: 100,default: null  })
   city: string;
+
   @Column({ type: 'varchar',length: 100,default: null  })
   buildingNO: string;
+
   @Column({ type: 'varchar',length: 100,default: null  })
   landmark: string;
+
   public softDelete(){
      this.deletedAt= new Date().toString()
   return this

@@ -71,11 +71,13 @@ export class BranchController {
    */
 //@UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/all')
-  findAll(
+  async findAll(
     @Query()
     query: BranchDto,
   ) {
-    return this.branchService.findAll(query);
+    const tmp = await this.branchService.findAll(query);
+    console.log('tmp = ', tmp);
+    return tmp;
   }
  
   @Get(':id')

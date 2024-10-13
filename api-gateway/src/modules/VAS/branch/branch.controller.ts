@@ -19,14 +19,10 @@ export class BranchController {
   async create( @Body()
     data: any,
   ) {
-
-    console.log("23",data);
-    
     return await this.branchService.create(data);
   }
 
   @Patch(':id')
- 
   update(
     @Param(
       'id',
@@ -57,7 +53,6 @@ export class BranchController {
    * @description:
    */
   @Get('/all')
- 
   findAll(
     @Query()
     query: any,

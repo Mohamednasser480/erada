@@ -16,12 +16,10 @@ export interface IBaseWithMeta extends IBaseWithId {
 }
 
 export interface IBranch extends IBaseWithMeta{
-
   managerId: string;
-
   status:string;
   name:string;
-  gaverment:string;
+  government:string;
   area:string;
   len?:string;
   lat?:string

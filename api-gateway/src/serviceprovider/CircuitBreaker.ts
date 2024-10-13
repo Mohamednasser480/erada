@@ -76,45 +76,33 @@ class CircuitBreaker {
         throw new Error('Internal server error');
       }
     }
-
     try {
       const response = await axios({
         ...request,
         timeout: this.timeout,
-       
       });
- 
       return this.success(response);
     } catch (err: any) {
-      console.log("89-> err", err);
-      
       return this.failure(err);
-
     }
   }
 
   private success(res: AxiosResponse): any {
     this.failureCount = 0;
-
     if (this.isHalfOpen()) {
       this.successCount++;
-
       if (this.successCount > this.successThreshold) {
         this.close();
       }
     }
-    
-
     return { status: res.status, data: res.data };
   }
 
   private failure(err: any): Promise<any> {
     this.failureCount++;
-
     if (this.failureCount >= this.failureThreshold) {
       this.open();
     }
-
     return Promise.reject(
        err
     );

@@ -10,7 +10,6 @@ export class StaffController {
   create(@Body() body) {
     try {
       return this.staffService.create(body);
-
     } catch (error) {
       console.log(error.status);
       
@@ -18,17 +17,15 @@ export class StaffController {
     }
   }
 
- 
+  @Get('all')
+  findAll(@Query() query: any) {
+    return this.staffService.findAll(query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.staffService.findOne(id);
   }
-
-  findAll(  @Query()
-  query: any,) {
-    return this.staffService.findAll(query);
-  }
-
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() body) {
@@ -39,7 +36,6 @@ export class StaffController {
   remove(@Param('id') id: string) {
     return this.staffService.remove(id);
   }
-
 
   @Get('reported/:id')
   reportTo(

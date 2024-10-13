@@ -38,7 +38,6 @@ export abstract class BaseService {
       limit,
       page,
       paginationType: PaginationTypeEnum.TAKE_AND_SKIP,
-      //https://github.com/nestjsx/nestjs-typeorm-paginate/issues/627
       metaTransformer: ({ currentPage, itemCount, itemsPerPage }) => {
         // Calculating the total of pages
         const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -67,11 +66,12 @@ export abstract class BaseService {
   }
 
   protected customErrorHandle(error) {
+    console.log(error);
     switch (error.name) {
       case 'HttpException':
-        throw new HttpException(error.response, error.status);
+        throw new HttpException(error.response, error?.status);
     }
-    switch (error.status || error.code || error.name) {
+    switch (error?.status || error?.code || error?.name) {
       case 400:
         return this._getBadRequestError(error.message);
       case 404:

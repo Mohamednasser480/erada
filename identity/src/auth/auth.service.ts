@@ -35,11 +35,7 @@ export class AuthService extends BaseService {
     try {
       const { staffId, password } = data;
       const staff: any = await this.StaffService.findByStaffId(staffId);
-      console.log("staff",staff);
-      
       const passwordIsValid = await bcrypt.compare(password, staff?.password);
-      console.log("passwordIsValid",passwordIsValid);
-      
       if (!passwordIsValid) {
         this._getBadRequestError(
           RESPONSE_MESSAGES.STAFF.INVALID_STAFF_NAME_OR_PASSWORD,

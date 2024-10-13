@@ -28,13 +28,8 @@ export class BranchService  {
         url: `${this.VAS_URL}/branch`,
         data: body,
       };
-         console.log(body);
-         
-        return await  this.circuitBreaker.send(request)
-
+      return await this.circuitBreaker.send(request);
     } catch (error) {
-
-      console.log("error",error);
       CustomErrorHandle.customErrorHandle(error)
     }
   }
@@ -93,18 +88,15 @@ export class BranchService  {
    */
   async findAll(data: any): Promise< any > {
     try {
-      let query:string=objectToQueryString(data)
+      let query:string = objectToQueryString(data)
       const request = {
         method: 'get',
         url: `${this.VAS_URL}/branch/all${query}`,
         data: {},
       };
-         
-        return await  this.circuitBreaker.send(request)
-
+      return this.circuitBreaker.send(request);
     } catch (error) {
-
-      console.log("error",error);
+      console.log('catch error in service api gateway',error.message);
       CustomErrorHandle.customErrorHandle(error)
     }
   }

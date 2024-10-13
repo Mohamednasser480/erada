@@ -1,5 +1,5 @@
 import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { IBranch } from '../..//types';
+import { IBranch } from '../../types';
 
 export class BranchDto implements Partial<IBranch> {
   @IsString()
@@ -10,23 +10,25 @@ export class BranchDto implements Partial<IBranch> {
 
   @IsString()
   managerId: string;
-  @IsString()
 
+  @IsString()
   street?:string
-  @IsString()
 
+  @IsString()
   buildingNO?:string
-  @IsString()
 
+  @IsString()
   landmark?:string
  
   @IsString()
-  gaverment:string;
+  government:string;
 
   @IsString()
   area:string;
+
   @IsString()
   len?:string;
+
   @IsString()
   lat?:string
 

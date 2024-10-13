@@ -6,19 +6,16 @@ export const branchValidationSchema: {
   [key in keyof IBranch]?: yup.AnySchema;
 } = {
   name: yup.string().required(),
-  gaverment: yup.string().required(),
+  government: yup.string().required(),
   area: yup.string().required(),
   managerId: yup.string().required().default(null),
-  lat: yup.string().default('null'),
-  len: yup.string().required().default('null'),
+  lat: yup.string().nullable().optional().default(''),
+  len: yup.string().nullable().optional().default(''),
   status: yup.string().required().default('active').oneOf(statusName),
-  street: yup.string().required().default('null'),
-  buildingNO: yup.string().required().default('null'),
-  landmark: yup.string().required().default('null'),
-  city: yup.string().required().default('null')
-
-
-
+  street: yup.string().nullable().optional().default(''),
+  buildingNO: yup.string().nullable().optional().default(''),
+  landmark: yup.string().nullable().optional().default(''),
+  city: yup.string().required().default('')
 };
 export const branchStatusValidationSchema: {
   [key in keyof IBranch]?: yup.AnySchema;
