@@ -64,13 +64,12 @@ export class BranchService extends BaseService {
     try {
       const { name } = data;
       const IsExist = await this.find({ id: id });
-
       if (!IsExist) {
         return this._getNotFoundError(
           RESPONSE_MESSAGES.Branch.Branch_ID_IS_NOT_VALID,
         );
       }
-      if (name != IsExist?.name) {
+      if (name === IsExist?.name) {
         const IsExist = await this.find({ name: name });
         if (IsExist) {
           return this._getNotFoundError(

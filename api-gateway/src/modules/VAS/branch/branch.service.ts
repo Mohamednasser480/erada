@@ -47,9 +47,7 @@ export class BranchService  {
         url: `${this.VAS_URL}/branch/${id}`,
         data: body,
       };
-         
         return await  this.circuitBreaker.send(request)
-
     } catch (error) {
 
       console.log("error",error);

@@ -44,7 +44,7 @@ export class BranchController {
     )
     id: string,
     @Body()
-    data: Branch,
+    data: BranchDto,
   ) {
     return this.branchService.update(id, data);
   }
@@ -75,9 +75,7 @@ export class BranchController {
     @Query()
     query: BranchDto,
   ) {
-    const tmp = await this.branchService.findAll(query);
-    console.log('tmp = ', tmp);
-    return tmp;
+    return await this.branchService.findAll(query);
   }
  
   @Get(':id')
