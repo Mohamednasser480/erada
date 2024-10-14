@@ -23,12 +23,8 @@ export class BranchController {
   }
 
   @Patch(':id')
-  update(
-    @Param(
-      'id',
-    )
-    id: string,
-    data: any,
+  update(@Param('id') id: string,
+         @Body() data: any,
   ) {
     return this.branchService.update(id, data);
   }
