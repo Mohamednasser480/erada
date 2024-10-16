@@ -20,5 +20,5 @@ export const branchValidationSchema: {
 export const branchStatusValidationSchema: {
   [key in keyof IBranch]?: yup.AnySchema;
 } = {
-  status: yup.boolean().required().default(true),
+  status: yup.string().required().default('active').oneOf(statusName),
 };
