@@ -104,10 +104,8 @@ export class BranchService extends BaseService {
           RESPONSE_MESSAGES.Branch.Branch_ID_IS_NOT_VALID,
         );
       }
-
-      IsExist.deletedAt= new Date().toString()
-      
-      const result = await this.branchRepository.update(id,IsExist);
+      IsExist.deletedAt = new Date().toString()
+      const result = await this.branchRepository.update(id,{ status: data.status});
       if (result?.affected > 0) {
         return {
           message: RESPONSE_MESSAGES.Branch.Branch_STATUS_UPDATED,
@@ -194,10 +192,18 @@ export class BranchService extends BaseService {
           search: '%' + search + '%',
         });
       }
-      return await this._paginate<IBranch>(qr, {
+      const branches: any = await this._paginate<IBranch>(qr, {
         limit: data.limit || 10,
         page: data.page || 1,
       });
+
+      await Promise.all(
+          branches.items.map(async (branch: any) => {
+            const staffCount = await this.getStaffCountByBranchId(branch.id);
+            branch.staffCount = staffCount.data;
+          })
+      );
+      return branches;
     } catch (err) {
       console.log(err.message);
       return this._getInternalServerError(err.message);
@@ -258,4 +264,47 @@ export class BranchService extends BaseService {
       return this._getInternalServerError(error.message);
     }
   }
+
+  async getStaffCountByBranchId(branchId: string): Promise<any> {
+    try {
+      const request = {
+        method: 'get',
+        url: `${this.IDENTITY_URL}/staff/branches/${branchId}`,
+        data: {},
+      };
+      return await this.circuitBreaker.send(request)
+    } catch (err) {
+      console.log(err.message);
+      return this._getInternalServerError(err.message);
+    }
+  }
+
+  async getBranchCountByStatus(): Promise<any> {
+    try {
+      const branchStatusCounts = await this.branchRepository
+          .createQueryBuilder('branch')
+          .select('branch.status', 'status')
+          .addSelect('COUNT(*)', 'branchCount')
+          .groupBy('branch.status')
+          .getRawMany();
+      const result = {
+        freezed: 0,
+        active: 0,
+        closed: 0,
+        all: 0
+      };
+
+      branchStatusCounts.forEach((count) => {
+        if (result[count.status] !== undefined) {
+          result[count.status] = parseInt(count.branchCount, 10);
+          result['all'] += result[count.status];
+        }
+      });
+      return result;
+    } catch (err) {
+      console.log(err.message);
+      return this._getInternalServerError(err.message);
+    }
+  }
+
 }

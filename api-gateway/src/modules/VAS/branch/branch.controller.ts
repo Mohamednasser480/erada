@@ -31,8 +31,7 @@ export class BranchController {
 
   // update status //
 
-  @Post('status/:id')
- 
+  @Patch('status/:id')
   updateStatus(
     @Param(
       'id',
@@ -56,7 +55,11 @@ export class BranchController {
     return this.branchService.findAll(query);
   }
 
-  //  
+  @Get('status')
+  getBranchCountByStatus() {
+    return this.branchService.getBranchCountByStatus();
+  }
+
   @Get(':id')
   find(
     @Param(

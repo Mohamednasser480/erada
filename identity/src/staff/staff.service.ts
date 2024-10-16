@@ -75,59 +75,24 @@ export class StaffService extends BaseService {
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.STAFF.STAFF_ID_NOT_VALID);
       }
-      // data.id = id;
-      console.log("IsExist",data.branchs);
       const {branchs} =data
       delete data.branchs
-      console.log("data",data);
-
       let result = await this.staffRepository.update(id,data );
-      console.log("result",result);
-      
-
       if (branchs) {
-        console.log("branchs",branchs);
-        
         let instertion:IBranch[]=[]
          for (const branch of branchs) {
            if (result.affected) {
-             console.log(branch);
-             
              instertion.push({staff:id,branchId:branch})
            }
          }
-         console.log("instertion branchs",instertion);
-
-      //   const connection = getConnection();
-         console.log("---------127-------");
-         
-       //  await connection.transaction(async transactionalEntityManager => {
-          //   const branchRepository =  transactionalEntityManager.getRepository(Branch);
-             console.log("---------131-------");
-
-        // Find all data by staff
         const branchsToDelete = await this.branchRepository.find({ where: { staff:{'id':id } }});
-                     console.log("---------135-------");
-
-        console.log("branchsToDelete",branchsToDelete);
-         
-
-         // Delete the found data
         await this.branchRepository.remove(branchsToDelete);
-
-        // // Insert new data
-    
         await this.branchRepository.save(instertion);
-      
-       
-    //  });
-       
        }
        if (result.affected > 0) {
         return {
           message: RESPONSE_MESSAGES.STAFF.STAFF_UPDATED_SUCCESSFULLY,
         };
-      // return result;
     }
    } catch (error) {
       this.customErrorHandle(error);
@@ -338,13 +303,22 @@ this.customErrorHandle(error);
         if (!manager) {
             throw new Error(`Manager with ID ${managerId} not found.`);
         }
-console.log(manager);
-
         // Use TypeORM's built-in tree functionality
         let employees = await this.staffRepository.findDescendantsTree( manager, { relations: ['employees']});
          let employeesTree:Staff[] =  StaffUtil.employeeTree(employees)
         return employeesTree;
 }
+  async getStaffByBranchId(branchId: string) {
+    try{
+      return this.staffRepository
+          .createQueryBuilder('staff')
+          .innerJoin('staff.branchs', 'branch')
+          .where('branch.branchId = :branchId', { branchId }).getCount();
+    }catch (error){
+      this._getInternalServerError(error.message);
+    }
+  }
+
 
 
 }

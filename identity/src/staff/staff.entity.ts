@@ -42,7 +42,6 @@ export class Staff extends BaseEntityWithId implements IStaff {
   employees: Staff[];
 
   @OneToMany(() => Branch, (branch) => branch.staff, { nullable: true })
-  
   branchs: string[];
 
   // @ApiProperty({ description: 'refresh token' })
