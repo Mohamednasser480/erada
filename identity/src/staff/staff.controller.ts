@@ -103,8 +103,10 @@ export class StuffController {
     return this.staffService.assiginTobranch(data);
   }
 
-
-
+  @Get('/branches/:branchId')
+  getStaffCountByBranchId(@Param('branchId') branchId: string) {
+    return this.staffService.getStaffByBranchId(branchId);
+  }
 
 //@UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id')
@@ -142,4 +144,5 @@ export class StuffController {
   ) {
     return this.staffService.getAllEmployeesUnderManager(id);
   }
+
 }

@@ -133,11 +133,21 @@ export class BranchService  {
         url: `${this.VAS_URL}/branch/delete/${id}`,
         data: {},
       };
-         
         return await  this.circuitBreaker.send(request)
-
     } catch (error) {
+      console.log("error",error);
+      CustomErrorHandle.customErrorHandle(error)
+    }
+  }
 
+  async getBranchCountByStatus(){
+    try {
+      const request = {
+        method: 'get',
+        url: `${this.VAS_URL}/branch/status`
+      };
+      return await  this.circuitBreaker.send(request)
+    } catch (error) {
       console.log("error",error);
       CustomErrorHandle.customErrorHandle(error)
     }

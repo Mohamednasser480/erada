@@ -28,7 +28,6 @@ export class BranchController {
   constructor(private readonly branchService: BranchService) {}
    
   @Post('/')
- 
   async create(
     @Body(new YupValidationPipe(getValidationSchema(branchValidationSchema)))
     data: BranchDto,
@@ -37,26 +36,20 @@ export class BranchController {
   }
 
   @Patch(':id')
-  update(
-    @Param(
+  update(@Param(
       'id',
       new UuIdValidationPipe({ id: RESPONSE_MESSAGES.COMMON.VALIDATION_ERROR }),
-    )
-    id: string,
+    ) id: string,
     @Body()
     data: BranchDto,
   ) {
     return this.branchService.update(id, data);
   }
 
-  // update status //
-
-  @Post('status/:id')
-  updateStatus(
-    @Param(
+  @Patch('status/:id')
+  updateStatus(@Param(
       'id',
-      new UuIdValidationPipe({ id: RESPONSE_MESSAGES.COMMON.VALIDATION_ERROR }),
-    )
+      new UuIdValidationPipe({ id: RESPONSE_MESSAGES.COMMON.VALIDATION_ERROR }))
     id: string,
     @Body(
       new YupValidationPipe(getValidationSchema(branchStatusValidationSchema)),
@@ -77,7 +70,12 @@ export class BranchController {
   ) {
     return await this.branchService.findAll(query);
   }
- 
+
+  @Get('/status')
+  getBranchCountByStatus(){
+    return this.branchService.getBranchCountByStatus();
+  }
+
   @Get(':id')
   find(
     @Param(
