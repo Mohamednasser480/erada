@@ -7,6 +7,7 @@ import databaseConfig from './config/database.config';
 import { BranchModule } from './modules/branch/branch.module';
 import { InsuranceCompanyModule } from './modules/insuranceCompany/insuranceCompany.module';
 import { InsurancePolicyModule } from './modules/insurancePolicy/insurancePolicy.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { InsurancePolicyModule } from './modules/insurancePolicy/insurancePolicy
     }),
  BranchModule,
  InsuranceCompanyModule,
- InsurancePolicyModule
+ InsurancePolicyModule,
+  ProductModule
   ],
   controllers: [AppController],
   providers: [AppService],

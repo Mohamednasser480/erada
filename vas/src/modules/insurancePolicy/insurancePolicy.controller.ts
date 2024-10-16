@@ -18,8 +18,6 @@ import { CreateInsurancePolicyDto } from './insurancePolicy.dto';
 import { InsurancePolicyService } from './insurancePolicy.service';
 import {CreateInsuranceCompanyDto} from "../insuranceCompany/insuranceCompany.dto";
 import {RESPONSE_MESSAGES} from "../../types/responseMessages";
-import {updateInsuranceCompanyValidationSchema} from "../insuranceCompany/insuranceCompany.schema";
-import {InsuranceCompanyEntity} from "../insuranceCompany/insuranceCompany.entity";
 
 @Controller('insurance-policies')
 export class InsurancePolicyController {

@@ -40,7 +40,9 @@ export class YupValidationPipe implements PipeTransform<any> {
    * @returns - promise
    */
   private async validate(value: any) {
-    return this.schema?.validate(value, { abortEarly: false });
+    const tmp = this.schema?.validate(value, { abortEarly: false });
+    console.log({ tmp });
+    return tmp;
   }
 }
 

@@ -10,7 +10,8 @@ export const branchValidationSchema: {
   area: yup.string().required(),
   managerId: yup.string().required().default(null),
   lat: yup.string().nullable().optional().default(''),
-  len: yup.string().nullable().optional().default(''),
+  len: yup.string().nullable().optional().
+  default(''),
   status: yup.string().required().default('active').oneOf(statusName),
   street: yup.string().nullable().optional().default(''),
   buildingNO: yup.string().nullable().optional().default(''),

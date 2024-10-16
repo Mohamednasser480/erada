@@ -11,6 +11,7 @@ import { ActionModule } from './modules/staff/action/action.module';
 import { BranchModule } from './modules/VAS/branch/branch.module';
 import {InsuranceCompanyModule} from "./modules/VAS/insuranceCompany/insuranceCompany.module";
 import {InsurancePolicyModule} from "./modules/VAS/insurancePolicy/insurancePolicy.module";
+import {ProductModule} from "./modules/VAS/product/product.module";
 
 dotenvConfig({ path: '.env' });
 console.log( process.env.IDENTITY_HOST); 
@@ -24,6 +25,7 @@ console.log( process.env.IDENTITY_HOST);
     BranchModule,
     InsuranceCompanyModule,
     InsurancePolicyModule,
+    ProductModule
   ]
 })
 export class AppModule {}
