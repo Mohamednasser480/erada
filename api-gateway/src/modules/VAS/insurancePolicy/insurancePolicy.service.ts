@@ -22,12 +22,12 @@ export class InsurancePolicyService {
         }
     }
 
-    async getInsurancePolices(insuranceCompanyId: string, query: any): Promise<any> {
+    async getInsurancePolices(query: any): Promise<any> {
         try {
             query = objectToQueryString(query)
             const request = {
                 method: 'get',
-                url: `${this.VAS_URL}/insurance-policies/${insuranceCompanyId}${query}`,
+                url: `${this.VAS_URL}/insurance-policies/all${query}`,
             };
             return await this.circuitBreaker.send(request)
         } catch (error) {

@@ -6,11 +6,25 @@ export class CreateInsurancePolicyDto implements Partial<IInsurancePolicy> {
     name: string;
 
    @IsNumber()
-   amount: number;
+   sellAmount: number;
+
+    @IsNumber()
+    buyAmount: number;
 
    @IsDate()
    startDate: Date;
 
    @IsDate()
    endDate: Date;
+}
+
+export class UpdateInsurancePolicyDto {
+    @IsNumber()
+    sellAmount: number;
+
+    @IsNumber()
+    buyAmount: number;
+
+    @IsDate()
+    endDate: Date;
 }

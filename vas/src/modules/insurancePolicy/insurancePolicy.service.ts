@@ -32,49 +32,50 @@ export class InsurancePolicyService extends BaseService {
         }
     }
 
-    async getInsurancePolices(insuranceCompanyId: string, query: any) {
+    async getInsurancePolices(query: any) {
         try {
-            const { page, limit, search, sort} = query;
-            const qr = this.insurancePolicyRepository.createQueryBuilder('insurancePolicy')
-                .where('insurancePolicy.insuranceCompanyId = :insuranceCompanyId', { insuranceCompanyId })
+            const { page = 1, limit = 10, search, sort, companyId } = query;
+            const qr = this.insurancePolicyRepository.createQueryBuilder('insurance_policy') // Use the correct table name
                 .select([
-                    'insurancePolicy.id',
-                    'insurancePolicy.name',
-                    'insurancePolicy.amount',
-                    'insurancePolicy.startDate',
-                    'insurancePolicy.endDate',
-                    'insurancePolicy.createdAt',
-                    'insurancePolicy.updatedAt',
+                    'insurance_policy.id',
+                    'insurance_policy.name',
+                    'insurance_policy.sellAmount',
+                    'insurance_policy.buyAmount',
+                    'insurance_policy.startDate',
+                    'insurance_policy.endDate',
+                    'insurance_policy.createdAt',
+                    'insurance_policy.updatedAt',
+                    'insurance_policy.insuranceCompanyId',
                 ]);
+
             if (sort) {
                 const param = this.buildSortParams<{ name: string }>(sort);
                 if (this.allowedFieldsToSort.includes(param[0])) {
-                    qr.orderBy(`insurancePolicy.${param[0]}`, param[1]);
+                    qr.orderBy(`insurance_policy.${param[0]}`, param[1]);
                 }
             }
 
             if (search) {
-                qr.andWhere('CAST(insurancePolicy.id AS TEXT) LIKE :search', { search: `%${search}%` });
+                qr.andWhere('CAST(insurance_policy.id AS TEXT) LIKE :search', { search: `%${search}%` });
+            }
+            if(companyId){
+                qr.andWhere('CAST(insurance_policy.insuranceCompanyId AS TEXT) LIKE :companyId', { companyId: `%${companyId}%` });
             }
 
-            return await this._paginate<IInsuranceCompany>(qr, {
-                limit: limit || 10,
-                page: page || 1
-            });
+            return await this._paginate<IInsuranceCompany>(qr, { limit, page });
         } catch (error) {
-            console.log(error.message);
+            console.error('Error fetching insurance policies:', error);
             return this._getInternalServerError(error.message);
         }
     }
 
-    async updateInsurancePolicy(id: string, data: {endDate: Date}) {
+    async updateInsurancePolicy(id: string, data: any) {
         try {
             const insurancePolicyExist = await this.find({ id });
             if (!insurancePolicyExist) {
                 return this._getNotFoundError(RESPONSE_MESSAGES.InsurancePolicy.POLICY_ID_IS_NOT_VALID);
             }
-            insurancePolicyExist.endDate = new Date(data.endDate);
-            await this.insurancePolicyRepository.update(id, insurancePolicyExist);
+            await this.insurancePolicyRepository.update(id, data);
             return { message: RESPONSE_MESSAGES.InsurancePolicy.POLICY_UPDATED_SUCCESSFULLY };
         } catch (error) {
             this._getBadRequestError(error.message);

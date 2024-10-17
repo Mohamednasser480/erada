@@ -8,7 +8,10 @@ export class InsurancePolicyEntity extends BaseEntityWithMeta {
     name: string;
 
     @Column({ type: 'decimal' })
-    amount: number;
+    sellAmount: number;
+
+    @Column({ type: 'decimal' })
+    buyAmount: number;
 
     @Column({ type: 'date' })
     startDate: Date;

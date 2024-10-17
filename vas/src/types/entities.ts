@@ -49,7 +49,8 @@ export interface IInsuranceCompany extends IBaseWithMeta {
 export interface IInsurancePolicy extends IBaseWithMeta {
   insuranceCompanyId: string;
   name: string;
-  amount: number;
+  sellAmount: number;
+  buyAmount: number;
   startDate: Date;
   endDate: Date;
 }

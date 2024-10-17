@@ -19,12 +19,9 @@ export class InsurancePolicyController {
         return await this.insurancePolicyService.createInsurancePolicy(data);
     }
 
-    @Get(':insuranceCompanyId')
-    findAllInsuranceCompanies(
-        @Param('insuranceCompanyId') insuranceCompanyId: string,
-        @Query() query: any
-    ) {
-        return this.insurancePolicyService.getInsurancePolices(insuranceCompanyId, query);
+    @Get('/all')
+    findAllInsuranceCompanies(@Query() query: any ) {
+        return this.insurancePolicyService.getInsurancePolices(query);
     }
 
     @Patch(':id')

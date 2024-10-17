@@ -12,9 +12,9 @@ import {
     YupValidationPipe,
 } from '../../utils/validation.pipes';
 import {
-    insurancePolicyValidationSchema
+    insurancePolicyValidationSchema, updateInsurancePolicySchema
 } from './insurancePolicy.schema';
-import { CreateInsurancePolicyDto } from './insurancePolicy.dto';
+import {CreateInsurancePolicyDto, UpdateInsurancePolicyDto} from './insurancePolicy.dto';
 import { InsurancePolicyService } from './insurancePolicy.service';
 import {CreateInsuranceCompanyDto} from "../insuranceCompany/insuranceCompany.dto";
 import {RESPONSE_MESSAGES} from "../../types/responseMessages";
@@ -34,17 +34,16 @@ export class InsurancePolicyController {
         return await this.insurancePolicyService.createInsurancePolicy(data);
     }
 
-    @Get(':insuranceCompanyId')
-    getInsurancePolices(
-        @Param('insuranceCompanyId') insuranceCompanyId: string,
-        @Query() query: any
-    ) {
-        return this.insurancePolicyService.getInsurancePolices(insuranceCompanyId, query);
+    @Get('/all')
+    getInsurancePolices(@Query() query: any) {
+        return this.insurancePolicyService.getInsurancePolices(query);
     }
 
     @Patch(':insurancePolicyId')
     update(@Param('insurancePolicyId', new UuIdValidationPipe({ id: RESPONSE_MESSAGES.COMMON.VALIDATION_ERROR }) ) id: string,
-           @Body() data: { endDate: Date }) {
+           @Body(new YupValidationPipe(getValidationSchema(updateInsurancePolicySchema)))
+               data: UpdateInsurancePolicyDto
+    ) {
         return this.insurancePolicyService.updateInsurancePolicy(id, data);
     }
 }
