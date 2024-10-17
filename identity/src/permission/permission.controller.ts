@@ -21,13 +21,10 @@ import {
 import { PermissionDto } from './permission.dto';
 import { PermissionService } from './permission.service';
 import { RESPONSE_MESSAGES } from '../types/responseMessages';
-import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
-import { PermissionGuard } from 'src/auth/permission.guard';
- 
+
 @Controller('permission')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post('/')
   @ApiOperation({ summary: RESPONSE_MESSAGES.PERMISSION.CREATE_PERMISSION })
   @ApiResponse({

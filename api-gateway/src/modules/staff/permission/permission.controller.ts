@@ -15,26 +15,19 @@ import { PermissionGuard } from 'src/modules/auth/guards/permission.guard';
 
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
-   @UseGuards(StaffGuard,PermissionGuard )
   @Post('/')
   async create(  @Body( )   data,@Request() req ) {
-
-    console.log("request.user ->",req.user);
-    
-    return req.user
     return await this.permissionService.create(data);
   }
   @Patch(':id')
   
   update(
-    @Param(  'id',  )
-    id: string,
-    @Body()data ) {
+    @Param('id') id: string,
+    @Body() data: any ) {
     return this.permissionService.update(id, data);
   }
 
   @Get(':id')
-  
   find(
     @Param( 'id')     id: string,  ) {
     return this.permissionService.findById(id);
