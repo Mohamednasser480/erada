@@ -22,6 +22,11 @@ export class StaffController {
     return this.staffService.findAll(query);
   }
 
+  @Get('status')
+  getStaffStatistics() {
+    return this.staffService.getStaffStatistics();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.staffService.findOne(id);

@@ -79,25 +79,16 @@ export class ActionService  {
       CustomErrorHandle.customErrorHandle(error)
     }
   }
-  
- 
 
-  /**
-   * @param {}
-   * @returns {}
-   * @description : This function is used to get role data
-   */
   async findAll(data: any) {
     try {
       let query:string=objectToQueryString(data)
       const request = {
         method: 'get',
-        url: `${this.IDENTITY_URL}/action${query}`,
+        url: `${this.IDENTITY_URL}/action/all${query}`,
         data: {},
       };
-         
         return await  this.circuitBreaker.send(request)
-
     } catch (error) {
 
       console.log("error",error);

@@ -1,6 +1,7 @@
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository, TreeRepository} from 'typeorm';
 import {Staff} from './staff.entity';
+import {Role} from '../role/role.entity';
 import {Inject, Injectable, Scope} from '@nestjs/common';
 import {BaseService} from '../abstract';
 import {IBranch, IStaff} from '../types';
@@ -17,6 +18,8 @@ export class StaffService extends BaseService {
   constructor(
     @InjectRepository(Staff)
     private readonly staffRepository: TreeRepository<Staff>,
+    @InjectRepository(Role)
+    private readonly roleRepository: TreeRepository<Role>,
     @InjectRepository(Branch)
     private readonly branchRepository: Repository<Branch>,
     @Inject(CACHE_MANAGER) private cacheService: Cache,
@@ -223,8 +226,7 @@ this.customErrorHandle(error);
    */
   async findAll(data: any) {
     try {
-      
-      const { search, sort, phone, branchId, status } = data;
+      const { search, sort, phone, staffId, status, name } = data;
       const qr = this.staffRepository.createQueryBuilder('staff');
       qr.leftJoinAndSelect('staff.role', 'role');
       qr.leftJoin('staff.branchs', 'branchs');
@@ -258,15 +260,20 @@ this.customErrorHandle(error);
         qr.andWhere('staff.phone LIKE :phone', {
           phone: '%' + phone + '%',
         });
-      } 
-        if (branchId) {
-        qr.andWhere('branchs.branchId LIKE :branchId', {
-          branchId: '%' + branchId + '%',
+      }
+      if (name) {
+        qr.andWhere('staff.name LIKE :name', {
+          name: '%' + name + '%',
         });
       }
-        if(status){
-          qr.andWhere('staff.status = :status', { status });
-        }
+      if (staffId) {
+        qr.andWhere('staff.staffId LIKE :staffId', {
+          staffId: '%' + staffId + '%',
+        });
+      }
+      if(status){
+        qr.andWhere('staff.status = :status', { status });
+      }
       if (search) {
         qr.andWhere(
           'staff.name LIKE :search OR staff.phone LIKE :search OR staff.staffId LIKE :search',
@@ -319,6 +326,45 @@ this.customErrorHandle(error);
           .where('branch.branchId = :branchId', { branchId }).getCount();
     }catch (error){
       this._getInternalServerError(error.message);
+    }
+  }
+
+  async getStaffStatistics(): Promise<any> {
+    try {
+      const staffStatistics = await this.staffRepository
+          .createQueryBuilder('staff')
+          .select('COUNT(staff.id)', 'totalStaff')
+          .addSelect('COUNT(CASE WHEN staff.status = true THEN 1 END)', 'activeStaff')
+          .addSelect('COUNT(CASE WHEN staff.status = false THEN 1 END)', 'inactiveStaff')
+          .getRawOne();
+
+      const rolesCount = await this.roleRepository
+          .createQueryBuilder('role')
+          .select('COUNT(role.id)', 'totalRoles')
+          .getRawOne();
+
+      return {
+        ...staffStatistics,
+        ...rolesCount
+      };
+      /*
+      const result = {
+        freezed: 0,
+        active: 0,
+        closed: 0,
+        all: 0
+      };
+
+      branchStatusCounts.forEach((count) => {
+        if (result[count.status] !== undefined) {
+          result[count.status] = parseInt(count.branchCount, 10);
+          result['all'] += result[count.status];
+        }
+      });
+      return result;*/
+    } catch (err) {
+      console.log(err.message);
+      return this._getInternalServerError(err.message);
     }
   }
 

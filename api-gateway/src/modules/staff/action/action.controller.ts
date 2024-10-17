@@ -15,15 +15,14 @@ import { ActionService } from './action.service';
 export class ActionController {
   constructor(private readonly actionService: ActionService) {}
   @Post('/')
-
   async create(
     @Body()
     data: any,
   ) {
     return await this.actionService.create(data);
   }
+
   @Patch(':id')
- 
   async update(
     @Param(      'id',    )    id: string,
     @Body()
@@ -32,30 +31,15 @@ export class ActionController {
     return await this.actionService.update(id, data);
   }
 
-  // update status //
-
   @Post('status/:id')
- 
   async updateStatus(
-    @Param(
-      'id',
-     
-    )
-    id: string,
-    @Body(
-      
-    )
-    data: any,
+    @Param('id') id: string,
+    @Body() data: any,
   ) {
     return await this.actionService.updateStatus(id, data);
   }
-  /**
-   * @param query - query params
-   * @description:
-   */
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
+
   @Get('/all')
-  
   findAll(
     @Query()
     query: any,

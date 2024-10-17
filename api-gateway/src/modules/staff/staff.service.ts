@@ -92,4 +92,17 @@ export class StaffService extends BaseService {
   remove(id: String) {
     return `This action removes a #${id} staff`;
   }
+
+  getStaffStatistics(){
+    try {
+      const request = {
+        method: 'get',
+        url: `${this.IDENTITY_URL}/staff/status`,
+      };
+      return this.circuitBreaker.send(request)
+    } catch (error) {
+      console.log("error",error);
+      CustomErrorHandle.customErrorHandle(error)
+    }
+  }
 }
