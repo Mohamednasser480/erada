@@ -4,7 +4,7 @@ import { Role } from './role.entity';
 import { Staff } from '../staff/staff.entity';
 import { Inject, Injectable, Scope, forwardRef } from '@nestjs/common';
 import { BaseService } from '../abstract';
-import { IRole } from '../types';
+import {IRole, IStaff} from '../types';
 import { RESPONSE_MESSAGES } from '../types/responseMessages';
 import { AuthService } from 'src/auth/auth.service';
 import { REQUEST } from '@nestjs/core';
@@ -128,7 +128,10 @@ export class RoleService extends BaseService {
           search: '%' + search + '%',
         });
       }
-      const roles = await qr.getMany();
+      const roles = await this._paginate<IStaff>(qr, {
+        limit: data.limit || 10,
+        page: data.page || 1,
+      });
       const staffCountsForEachRole = await this.staffRepository
           .createQueryBuilder('staff')
           .select('role.name', 'roleName')
@@ -136,7 +139,7 @@ export class RoleService extends BaseService {
           .leftJoin('staff.role', 'role')
           .groupBy('role.name')
           .getRawMany();
-      roles.map( (role: any) => {
+      roles.items.map( (role: any) => {
         const index = staffCountsForEachRole.findIndex(record => record.roleName == role.name);
         if(index !== -1)
           role.staffCount = staffCountsForEachRole[index].staffCount;
