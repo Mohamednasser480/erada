@@ -347,21 +347,6 @@ this.customErrorHandle(error);
         ...staffStatistics,
         ...rolesCount
       };
-      /*
-      const result = {
-        freezed: 0,
-        active: 0,
-        closed: 0,
-        all: 0
-      };
-
-      branchStatusCounts.forEach((count) => {
-        if (result[count.status] !== undefined) {
-          result[count.status] = parseInt(count.branchCount, 10);
-          result['all'] += result[count.status];
-        }
-      });
-      return result;*/
     } catch (err) {
       console.log(err.message);
       return this._getInternalServerError(err.message);
