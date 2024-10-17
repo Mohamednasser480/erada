@@ -224,7 +224,7 @@ this.customErrorHandle(error);
   async findAll(data: any) {
     try {
       
-      const { search, sort, phone,branchId } = data;
+      const { search, sort, phone, branchId, status } = data;
       const qr = this.staffRepository.createQueryBuilder('staff');
       qr.leftJoinAndSelect('staff.role', 'role');
       qr.leftJoin('staff.branchs', 'branchs');
@@ -264,6 +264,9 @@ this.customErrorHandle(error);
           branchId: '%' + branchId + '%',
         });
       }
+        if(status){
+          qr.andWhere('staff.status = :status', { status });
+        }
       if (search) {
         qr.andWhere(
           'staff.name LIKE :search OR staff.phone LIKE :search OR staff.staffId LIKE :search',
