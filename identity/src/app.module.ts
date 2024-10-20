@@ -11,6 +11,7 @@ import {database} from './config/database.config';
 import { join } from 'path';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { RoleModule } from './role/role.module';
+import { GroupModule } from './group/group.module';
 import { PermissionModule } from './permission/permission.module';
 import { ActionModule } from './action/action.module';
 import { JwtStrategy } from './auth/jwt.strategy';
@@ -38,6 +39,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     StaffModule,
     SidebarModule,
     RoleModule,
+    GroupModule,
     PermissionModule,
     ActionModule,
   ],

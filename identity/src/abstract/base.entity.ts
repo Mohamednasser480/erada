@@ -31,6 +31,13 @@ export abstract class BaseEntityWithId extends BaseEntity {
   @ApiProperty({ description: 'uuid' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
+   
+@Column({ nullable: true })
+deleted:  Date | null;
+
+softDelete(){
+ return   this.deleted = new Date();
+} 
 }
 export abstract class BaseEntityWithMeta extends BaseEntityWithId {
   @ApiProperty({ description: 'created by' })
