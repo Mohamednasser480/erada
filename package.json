@@ -1,0 +1,16 @@
+{
+  "name": "erada",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start-dev:build":"    docker compose -f  docker-compose.yml  up -d --build --force-recreate",
+        "start:build":"    docker compose -f  docker-compose-prod.yml  up -d --build --force-recreate",
+
+    "clear": "docker stop $(docker ps -aq) && docker rm $(docker ps -aq)",
+    "clean": "docker rmi -f $(docker images -f 'dangling=true' -q)",
+    "stop": "docker kill $(docker ps -q)"
+    },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
