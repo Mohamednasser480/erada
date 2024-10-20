@@ -60,3 +60,8 @@ export interface IResetPassword {
   oldPassword: string;
   newPassword: string;
 }
+
+export interface IGroup extends IBaseWithId {
+  name: string;
+  isActive: boolean;
+}

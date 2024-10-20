@@ -39,9 +39,10 @@ export class BranchController {
   update(@Param(
       'id',
       new UuIdValidationPipe({ id: RESPONSE_MESSAGES.COMMON.VALIDATION_ERROR }),
-    ) id: string,
-    @Body()
-    data: BranchDto,
+    )
+    id: string,
+    @Body(new YupValidationPipe(getValidationSchema(branchValidationSchema)))
+    data: Branch,
   ) {
     return this.branchService.update(id, data);
   }
@@ -64,16 +65,11 @@ export class BranchController {
    */
 //@UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/all')
-  async findAll(
+  findAll(
     @Query()
     query: BranchDto,
   ) {
-    return await this.branchService.findAll(query);
-  }
-
-  @Get('/status')
-  getBranchCountByStatus(){
-    return this.branchService.getBranchCountByStatus();
+    return this.branchService.findAll(query);
   }
 
   @Get(':id')

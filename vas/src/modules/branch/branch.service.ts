@@ -8,7 +8,7 @@ import { RESPONSE_MESSAGES } from '../../types/responseMessages';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import CircuitBreaker from 'src/utils/CircuitBreaker';
-export const allowedFieldsToSort = ['name','status','governemnt','area'];
+export const allowedFieldsToSort = ['name','status','government','area'];
 const AllowParams = Object.freeze({
   SLUG: 'branch', // add sidebar slug here
   ADD: 'add', // add actions here
@@ -139,7 +139,7 @@ export class BranchService extends BaseService {
    */
   async findAll(data: any): Promise<any> {
     try {
-      const { search, name, sort,status,government,area } = data;
+      const { search, name, sort,status, government,area } = data;
       const qr = this.branchRepository.createQueryBuilder('branch');
       qr.select(['branch.id', 'branch.name', 'branch.status','branch.buildingNO','branch.managerId','branch.government','branch.area'
         ,'branch.lat','branch.len','branch.street','branch.city','branch.landmark','branch.updatedAt','branch.createdAt'
