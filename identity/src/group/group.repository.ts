@@ -7,7 +7,7 @@ import { InjectDataSource } from '@nestjs/typeorm'; // Import InjectDataSource
 @Injectable()
 export class GroupRepository extends BaseRepository<Group> {
   constructor(
-    @InjectDataSource() private readonly dataSource: DataSource, // Inject the DataSource
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {
     super(Group, dataSource);
   }

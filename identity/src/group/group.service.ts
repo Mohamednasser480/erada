@@ -105,7 +105,6 @@ export class GroupService extends BaseService {
   async findById(id: string) {
     try {
       const exists = await this.groupRepository.findOneEntity({ id });
-      console.log({exists});
       if (!exists) {
         return this._getInternalServerError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
       }

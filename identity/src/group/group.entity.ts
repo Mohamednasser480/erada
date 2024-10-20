@@ -6,18 +6,13 @@ import { Staff } from 'src/staff/staff.entity';
 
 @Entity()
 export class Group extends BaseEntityWithId implements IGroup {
-  @ApiProperty({ description: 'name' })
   @Column({ type: 'varchar', length: 100, default: null })
   name: string;
-  @ApiProperty({ description: 'Is active flag' })
+
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @ApiProperty({ description: 'staff id' })
-  @OneToMany(() => Staff, (staff) => staff.group, {
-    onUpdate: 'CASCADE',
-  })
+  @OneToMany(() => Staff, (staff) => staff.group, {onUpdate: 'CASCADE'})
   @JoinColumn()
   staff: string;
-
  }
