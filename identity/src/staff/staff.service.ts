@@ -192,26 +192,40 @@ this.customErrorHandle(error);
       return this._getInternalServerError(err.message);
     }
   }
-  /**
-   * @param {object}
-   * @returns {dataObject}
-   * @description : This function is used to get staff by id
-   */
   async findById(id: string) {
     try {
       const cacheStaff = await this.cacheService.get(`staff_${id}`);
       if (cacheStaff) {
         return cacheStaff;
       }
-      const IsExist = await this.find({ id: id });
-      if (!IsExist) {
+
+      const isExist = await this.find({ id: id });
+      if (!isExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.STAFF.STAFF_ID_NOT_VALID);
       }
-      const staff = await this.staffRepository.findOne({
-        where: {
-          id: id,
-        },
-      });
+
+      const staff: any = await this.staffRepository
+          .createQueryBuilder('staff')
+          .leftJoinAndSelect('staff.role', 'role')
+          .leftJoinAndSelect('staff.group', 'group')
+          .leftJoinAndSelect('role.permission', 'permission')
+          .leftJoinAndSelect('permission.action', 'action')
+          .leftJoinAndSelect('permission.sidebar', 'sidebar')
+          .where('staff.id = :id', { id })
+          .getOne();
+      staff.role.permission = staff.role.permission.reduce((acc: any, item: any) => {
+        const sidebarName = item.sidebar.name;
+        const actionName = item.action.name;
+
+        if (!acc[sidebarName]) {
+          acc[sidebarName] = [];
+        }
+        if (actionName) {
+          acc[sidebarName].push(actionName);
+        }
+        return acc;
+      }, {});
+
       if (staff) {
         await this.cacheService.set(`staff_${id}`, staff);
         const cachedData = await this.cacheService.get(id.toString());
@@ -223,6 +237,7 @@ this.customErrorHandle(error);
       return this._getInternalServerError(err.message);
     }
   }
+
   /**
    * @param {object}
    * @returns {dataObject}
