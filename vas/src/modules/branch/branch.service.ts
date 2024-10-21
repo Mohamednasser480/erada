@@ -47,9 +47,12 @@ export class BranchService extends BaseService {
           RESPONSE_MESSAGES.Branch.Branch_IS_ALREADY_EXIST,
         );
       }
+      console.log('data = ', data);
       const created= this.branchRepository.create(data);
+      console.log({ created });
       return this.branchRepository.save(created);
     } catch (error) {
+      console.log({error});
       this._getBadRequestError(error.message);
     }
   }

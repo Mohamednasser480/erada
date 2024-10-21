@@ -59,11 +59,7 @@ export class Staff extends BaseEntityWithId implements IStaff {
   @Column({ type: 'boolean', default: true })
   status: boolean;
 
-  @ApiProperty({ description: 'group id', nullable: true })
-  @ManyToOne(() => Group, {
-    eager: true,
-    nullable: true,
-  })
+  @ManyToOne(() => Group, (group) => group.staff, {eager: true, nullable: true,})
   @JoinColumn()
   group: string;
 }

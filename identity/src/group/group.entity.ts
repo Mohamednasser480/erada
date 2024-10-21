@@ -13,5 +13,5 @@ export class Group extends BaseEntityWithId implements IGroup {
 
   @OneToMany(() => Staff, (staff) => staff.group, {onUpdate: 'CASCADE'})
   @JoinColumn()
-  staff: string;
+  staff: Staff[];
 }
