@@ -65,9 +65,6 @@ export class AuthController {
    @UseGuards(JwtAuthGuard)
   @Get('/staff')
   async getStaffByReq( @Request() req ){
-    console.log("here req to get jwt");
-    console.log( req.headers);
-    
     return  this.authService.getStaffByReq(req);
 
   }

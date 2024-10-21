@@ -6,7 +6,6 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Staff } from './staff.entity';
@@ -19,12 +18,9 @@ import { findValidationSchema, staffValidationSchema } from './staff.schema';
 import { FindStaffDto, StaffDto } from './staff.dto';
 import { StaffService } from './staff.service';
 import { RESPONSE_MESSAGES } from '../types/responseMessages';
-import { JwtAuthGuard } from '../auth/jwt.auth.guard';
-import { PermissionGuard } from 'src/auth/permission.guard';
 @Controller('staff')
 export class StuffController {
   constructor(private readonly staffService: StaffService) {}
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post('/')
   @ApiOperation({ summary: 'Create staff' })
   @ApiResponse({
@@ -103,8 +99,15 @@ export class StuffController {
     return this.staffService.assiginTobranch(data);
   }
 
+  @Get('/branches/:branchId')
+  getStaffCountByBranchId(@Param('branchId') branchId: string) {
+    return this.staffService.getStaffByBranchId(branchId);
+  }
 
-
+  @Get('/status')
+  getStaffStatistics(){
+    return this.staffService.getStaffStatistics();
+  }
 
 //@UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id')
@@ -142,4 +145,5 @@ export class StuffController {
   ) {
     return this.staffService.getAllEmployeesUnderManager(id);
   }
+
 }

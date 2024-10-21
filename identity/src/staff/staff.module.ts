@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { StuffController } from './staff.controller';
 import { StaffService } from './staff.service';
 import { Staff } from './staff.entity';
+import { Role } from '../role/role.entity';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
@@ -12,7 +13,7 @@ import { BranchModule } from './branch/branch.module';
   imports: [
     CacheModule.register({ host: '127.0.0.1', port: 6379, db: 0, ttl: 100000 }),
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([Staff,Branch]),
+    TypeOrmModule.forFeature([Staff,Branch, Role]),
     AuthModule,
     BranchModule,
   ],

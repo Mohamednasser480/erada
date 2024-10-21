@@ -12,6 +12,7 @@ import { GroupModule } from './modules/staff/group/group.module';
 import { BranchModule } from './modules/VAS/branch/branch.module';
 import {InsuranceCompanyModule} from "./modules/VAS/insuranceCompany/insuranceCompany.module";
 import {InsurancePolicyModule} from "./modules/VAS/insurancePolicy/insurancePolicy.module";
+
 dotenvConfig({ path: '.env' });
 console.log( process.env.IDENTITY_HOST); 
 @Module({

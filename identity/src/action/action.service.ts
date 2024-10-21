@@ -129,16 +129,14 @@ export class ActionService extends BaseService {
   async findAll(data: any) {
     try {
       const { search, name, sort } = data;
-      console.log({ search, name, sort });
-      
+
       const qr = this.actionRepository.createQueryBuilder('action');
       qr.select(['action.id', 'action.name', 'action.status']);
       if (sort) {
         const param = this.buildSortParams<{
           name: string;
         }>(sort); //check if param is one of keys
-        console.log("param",param);
-        
+
         if (allowedFieldsToSort.includes(param[0])) {
           if (param[0] === 'name') {
             qr.orderBy(`action.${param[0]}`, param[1]);

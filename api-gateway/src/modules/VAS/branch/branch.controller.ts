@@ -15,32 +15,23 @@ import { BranchService } from './branch.service';
 export class BranchController {
   constructor(private readonly branchService: BranchService) {}
   @Post('/')
-  
+
   async create( @Body()
     data: any,
   ) {
-
-    console.log("23",data);
-    
     return await this.branchService.create(data);
   }
 
   @Patch(':id')
- 
-  update(
-    @Param(
-      'id',
-    )
-    id: string,
-    data: any,
+  update(@Param('id') id: string,
+         @Body() data: any,
   ) {
     return this.branchService.update(id, data);
   }
 
   // update status //
 
-  @Post('status/:id')
- 
+  @Patch('status/:id')
   updateStatus(
     @Param(
       'id',
@@ -57,7 +48,6 @@ export class BranchController {
    * @description:
    */
   @Get('/all')
- 
   findAll(
     @Query()
     query: any,
@@ -65,12 +55,16 @@ export class BranchController {
     return this.branchService.findAll(query);
   }
 
-  //  
+  @Get('status')
+  getBranchCountByStatus() {
+    return this.branchService.getBranchCountByStatus();
+  }
+
   @Get(':id')
   find(
     @Param(
       'id',
-      
+
     )
     id: string,
   ) {
@@ -78,7 +72,7 @@ export class BranchController {
   }
   // delete API
   @Delete('delete/:id')
- 
+
   delete(@Param('id') id: string) {
     return this.branchService.delete(id);
   }

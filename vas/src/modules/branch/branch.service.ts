@@ -8,7 +8,7 @@ import { RESPONSE_MESSAGES } from '../../types/responseMessages';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import CircuitBreaker from 'src/utils/CircuitBreaker';
-export const allowedFieldsToSort = ['name','status','gaverment','area'];
+export const allowedFieldsToSort = ['name','status','governemnt','area'];
 const AllowParams = Object.freeze({
   SLUG: 'branch', // add sidebar slug here
   ADD: 'add', // add actions here
@@ -47,28 +47,8 @@ export class BranchService extends BaseService {
           RESPONSE_MESSAGES.Branch.Branch_IS_ALREADY_EXIST,
         );
       }
-    
-      const created = await this.branchRepository.create(data);
-  
-      
-      let  result= await this.branchRepository.save(created);
-      //  if(result){
-      //   let branchAssign={
-      //     staffId:data.managerId,
-      //     branchId:result.id
-      //   }
-      //   console.log("created",created);
-        
-      //   const request = {
-      //     method: 'post',
-      //     url: `${this.IDENTITY_URL}/branch/`,
-      //     data: branchAssign,
-      //   };
-        
-      //   await  this.circuitBreaker.send(request)
-
-      // }
-       return result ;
+      const created= this.branchRepository.create(data);
+      return this.branchRepository.save(created);
     } catch (error) {
       this._getBadRequestError(error.message);
     }
@@ -84,13 +64,12 @@ export class BranchService extends BaseService {
     try {
       const { name } = data;
       const IsExist = await this.find({ id: id });
-
       if (!IsExist) {
         return this._getNotFoundError(
           RESPONSE_MESSAGES.Branch.Branch_ID_IS_NOT_VALID,
         );
       }
-      if (name != IsExist?.name) {
+      if (name === IsExist?.name) {
         const IsExist = await this.find({ name: name });
         if (IsExist) {
           return this._getNotFoundError(
@@ -125,10 +104,8 @@ export class BranchService extends BaseService {
           RESPONSE_MESSAGES.Branch.Branch_ID_IS_NOT_VALID,
         );
       }
-
-      IsExist.deletedAt= new Date().toString()
-      
-      const result = await this.branchRepository.update(id,IsExist);
+      IsExist.deletedAt = new Date().toString()
+      const result = await this.branchRepository.update(id,{ status: data.status});
       if (result?.affected > 0) {
         return {
           message: RESPONSE_MESSAGES.Branch.Branch_STATUS_UPDATED,
@@ -160,11 +137,11 @@ export class BranchService extends BaseService {
    * @returns {}
    * @description : This function is used to get branch data
    */
-  async findAll(data: any) {
+  async findAll(data: any): Promise<any> {
     try {
-      const { search, name, sort,status,gaverment,area } = data;
+      const { search, name, sort,status,government,area } = data;
       const qr = this.branchRepository.createQueryBuilder('branch');
-      qr.select(['branch.id', 'branch.name', 'branch.status','branch.buildingNO','branch.managerId','branch.gaverment','branch.aree'
+      qr.select(['branch.id', 'branch.name', 'branch.status','branch.buildingNO','branch.managerId','branch.government','branch.area'
         ,'branch.lat','branch.len','branch.street','branch.city','branch.landmark','branch.updatedAt','branch.createdAt'
        ]) ;
 
@@ -172,17 +149,17 @@ export class BranchService extends BaseService {
         const param = this.buildSortParams<{
           name: string;
           status: string;
-          gaverment: string;
+          government: string;
           area: string;        }>(sort); //check if param is one of keys
 
         if (allowedFieldsToSort.includes(param[0])) {
           if (param[0] === 'status') {
             qr.orderBy(`branch.${param[0]}`, param[1]);
-          } if (param[0] === 'gaverment') {
+          } if (param[0] === 'government') {
             qr.orderBy(`branch.${param[0]}`, param[1]);
           } if (param[0] === 'area') {
             qr.orderBy(`branch.${param[0]}`, param[1]);
-         
+
         }
       }
      } else {
@@ -199,9 +176,9 @@ export class BranchService extends BaseService {
         });
       }
 
-      if (gaverment) {
-        qr.andWhere('branch.gaverment LIKE :gaverment', {
-          gaverment: '%' + gaverment + '%',
+      if (government) {
+        qr.andWhere('branch.government LIKE :government', {
+          government: '%' + government + '%',
         });
       } if (area) {
         qr.andWhere('branch.area LIKE :area', {
@@ -215,13 +192,21 @@ export class BranchService extends BaseService {
           search: '%' + search + '%',
         });
       }
-      // return await qr.getMany()
-      return await this._paginate<IBranch>(qr, {
+      const branches: any = await this._paginate<IBranch>(qr, {
         limit: data.limit || 10,
         page: data.page || 1,
       });
+
+      await Promise.all(
+          branches.items.map(async (branch: any) => {
+            const staffCount = await this.getStaffCountByBranchId(branch.id);
+            branch.staffCount = staffCount.data;
+          })
+      );
+      return branches;
     } catch (err) {
-      this._getInternalServerError(err.message);
+      console.log(err.message);
+      return this._getInternalServerError(err.message);
     }
   }
 
@@ -238,15 +223,9 @@ export class BranchService extends BaseService {
           RESPONSE_MESSAGES.Branch.Branch_ID_IS_NOT_VALID,
         );
       }
-        let result = await this.branchRepository.findOne({
-        where: {
-          id: id,
-        }
-      });
-    
-      
-           return result
-      
+        return this.branchRepository.findOne({
+        where: { id }
+        });
     } catch (err) {
       return this._getInternalServerError(err.message);
     }
@@ -277,6 +256,48 @@ export class BranchService extends BaseService {
       }
     } catch (error) {
       return this._getInternalServerError(error.message);
+    }
+  }
+
+  async getStaffCountByBranchId(branchId: string): Promise<any> {
+    try {
+      const request = {
+        method: 'get',
+        url: `${this.IDENTITY_URL}/staff/branches/${branchId}`,
+        data: {},
+      };
+      return await this.circuitBreaker.send(request)
+    } catch (err) {
+      console.log(err.message);
+      return this._getInternalServerError(err.message);
+    }
+  }
+
+  async getBranchCountByStatus(): Promise<any> {
+    try {
+      const branchStatusCounts = await this.branchRepository
+          .createQueryBuilder('branch')
+          .select('branch.status', 'status')
+          .addSelect('COUNT(*)', 'branchCount')
+          .groupBy('branch.status')
+          .getRawMany();
+      const result = {
+        freezed: 0,
+        active: 0,
+        closed: 0,
+        all: 0
+      };
+
+      branchStatusCounts.forEach((count) => {
+        if (result[count.status] !== undefined) {
+          result[count.status] = parseInt(count.branchCount, 10);
+          result['all'] += result[count.status];
+        }
+      });
+      return result;
+    } catch (err) {
+      console.log(err.message);
+      return this._getInternalServerError(err.message);
     }
   }
 }

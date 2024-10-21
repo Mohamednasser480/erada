@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { Branch } from './branch.entity';
 import {
@@ -49,8 +48,6 @@ export class BranchController {
     return this.branchService.update(id, data);
   }
 
-  // update status //
-
   @Post('status/:id')
   updateStatus(
     @Param(
@@ -65,11 +62,7 @@ export class BranchController {
   ) {
     return this.branchService.updateStatus(id, data);
   }
-  /**
-   * @param query - query params
-   * @description:
-   */
-//@UseGuards(JwtAuthGuard, PermissionGuard)
+
   @Get('/all')
   findAll(
     @Query()
@@ -77,7 +70,12 @@ export class BranchController {
   ) {
     return this.branchService.findAll(query);
   }
- 
+
+  @Get('/status')
+  getBranchCountByStatus(){
+    return this.branchService.getBranchCountByStatus();
+  }
+
   @Get(':id')
   find(
     @Param(
@@ -90,8 +88,7 @@ export class BranchController {
   ) {
     return this.branchService.findById(id);
   }
-  // delete API
-   
+
   @Delete('delete/:id')
    delete(@Param('id') id: string) {
     return this.branchService.delete(id);
