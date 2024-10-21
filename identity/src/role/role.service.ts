@@ -4,7 +4,7 @@ import { Role } from './role.entity';
 import { Staff } from '../staff/staff.entity';
 import { Inject, Injectable, Scope, forwardRef } from '@nestjs/common';
 import { BaseService } from '../abstract';
-import { IRole } from '../types';
+import {IGroup, IRole} from '../types';
 import { RESPONSE_MESSAGES } from '../types/responseMessages';
 import { AuthService } from 'src/auth/auth.service';
 import { REQUEST } from '@nestjs/core';
@@ -100,12 +100,13 @@ export class RoleService extends BaseService {
 
   async findAll(data: any) {
     try {
-      const { search, role, sort } = data;
+      const { search, role, sort, limit = 10, page = 1 } = data;
       const qr = this.roleRepository
           .createQueryBuilder('role')
           .leftJoinAndSelect('role.permission', 'permission')
           .leftJoinAndSelect('permission.sidebar', 'sidebar')
           .leftJoinAndSelect('permission.action', 'action')
+          .loadRelationCountAndMap('role.staffCount', 'role.staff', 'staff')
       if (sort) {
         const param = this.buildSortParams<{
           name: string;
@@ -128,20 +129,7 @@ export class RoleService extends BaseService {
           search: '%' + search + '%',
         });
       }
-      const roles = await qr.getMany();
-      const staffCountsForEachRole = await this.staffRepository
-          .createQueryBuilder('staff')
-          .select('role.name', 'roleName')
-          .addSelect('COUNT(staff.id)', 'staffCount')
-          .leftJoin('staff.role', 'role')
-          .groupBy('role.name')
-          .getRawMany();
-      roles.map( (role: any) => {
-        const index = staffCountsForEachRole.findIndex(record => record.roleName == role.name);
-        if(index !== -1)
-          role.staffCount = staffCountsForEachRole[index].staffCount;
-      });
-      return roles;
+     return this._paginate<IRole>(qr, { limit, page });
     } catch (err) {
       this._getInternalServerError(err.message);
     }
@@ -149,11 +137,18 @@ export class RoleService extends BaseService {
 
   async findById(id: string) {
     try {
-      const IsExist = await this.find({ id: id });
-      if (!IsExist) {
+      const role = await this.roleRepository
+          .createQueryBuilder('role')
+          .leftJoinAndSelect('role.permission', 'permission')
+          .leftJoinAndSelect('permission.sidebar', 'sidebar')
+          .leftJoinAndSelect('permission.action', 'action')
+          .loadRelationCountAndMap('role.staffCount', 'role.staff', 'staff')
+          .where('role.id =:id', { id })
+          .getOne();
+      if (!role) {
         return this._getNotFoundError(RESPONSE_MESSAGES.ROLE.ROLE_ID_IS_NOT_VALID);
       }
-      return await this.roleRepository.findOne({ where: { id } });
+      return role;
     } catch (err) {
       return this._getInternalServerError(err.message);
     }

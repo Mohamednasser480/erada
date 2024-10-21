@@ -246,7 +246,7 @@ this.customErrorHandle(error);
    */
   async findAll(data: any) {
     try {
-      const { search, sort, phone, staffId, status, name, groupId} = data;
+      const { search, sort, phone, staffId, status, name, groupId, roleId} = data;
       const qr = this.staffRepository.createQueryBuilder('staff');
       qr.leftJoinAndSelect('staff.role', 'role');
       qr.leftJoin('staff.branchs', 'branchs');
@@ -298,6 +298,9 @@ this.customErrorHandle(error);
       }
       if (groupId) {
         qr.andWhere('group.id = :groupId', { groupId });
+      }
+      if (roleId) {
+        qr.andWhere('role.id = :roleId', { roleId });
       }
       if (search) {
         qr.andWhere(

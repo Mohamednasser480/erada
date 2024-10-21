@@ -3,6 +3,7 @@ import { BaseEntityWithId } from '../abstract';
 import { IRole } from '../types';
 import { Column, Entity, OneToMany, JoinColumn } from 'typeorm';
 import { Permission } from 'src/permission/permission.entity';
+import {Staff} from "../staff/staff.entity";
 
 @Entity()
 export class Role extends BaseEntityWithId implements IRole {
@@ -19,4 +20,8 @@ export class Role extends BaseEntityWithId implements IRole {
   })
   @JoinColumn()
   permission: string;
+
+  @OneToMany(() => Staff, (staff) => staff.role, {onUpdate: 'CASCADE'})
+  @JoinColumn()
+  staff: Staff[];
 }

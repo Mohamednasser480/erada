@@ -138,7 +138,6 @@ export class GroupService extends BaseService {
           .where('group.id = :id', { id })
           .groupBy('group.name')
           .getRawMany();
-      console.log({ staffCountByGroupId });
       const activeStaff = +staffCountByGroupId[0]?.activeCount || 0;
       const inactiveStaff = +staffCountByGroupId[0]?.inactiveCount || 0;
       return {...exists, activeStaff, inactiveStaff };
