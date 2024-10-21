@@ -129,7 +129,19 @@ export class GroupService extends BaseService {
       if (!exists) {
         return this._getInternalServerError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
       }
-      return exists;
+      const staffCountByGroupId: any = await this.staffRepository
+          .createQueryBuilder('staff')
+          .select('group.name', 'groupName')
+          .addSelect('COUNT(CASE WHEN staff.status = true THEN 1 END)', 'activeCount')   // Count active staff
+          .addSelect('COUNT(CASE WHEN staff.status = false THEN 1 END)', 'inactiveCount') // Count inactive staff
+          .leftJoin('staff.group', 'group')
+          .where('group.id = :id', { id })
+          .groupBy('group.name')
+          .getRawMany();
+      console.log({ staffCountByGroupId });
+      const activeStaff = +staffCountByGroupId[0]?.activeCount || 0;
+      const inactiveStaff = +staffCountByGroupId[0]?.inactiveCount || 0;
+      return {...exists, activeStaff, inactiveStaff };
     } catch (err) {
       return this._getInternalServerError(err.message);
     }
