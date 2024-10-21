@@ -10,6 +10,7 @@ import {RESPONSE_MESSAGES} from '../types/responseMessages';
 import {CACHE_MANAGER} from '@nestjs/cache-manager';
 import {Cache} from 'cache-manager';
 import {Branch} from './branch/branch.entity';
+import {Group} from "../group/group.entity"
 import {StaffUtil} from './staff-util';
 
 export const allowedFieldsToSort = ['phone', 'status', 'name','branchId'];
@@ -22,12 +23,14 @@ export class StaffService extends BaseService {
     private readonly roleRepository: TreeRepository<Role>,
     @InjectRepository(Branch)
     private readonly branchRepository: Repository<Branch>,
+    @InjectRepository(Group)
+    private readonly groupRepository: Repository<Group>,
     @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {
     super();
   }
 
-  async create(data: Partial<IStaff>) {
+  async create(data: any) {
     const { staffId, password,branchs } = data;
     try {
       const IsExist = await this.find({ staffId: staffId });
@@ -71,13 +74,22 @@ export class StaffService extends BaseService {
    * @returns {dataObject}
    * @description :This function is used to update staff
    */
-  async update(id: string, data: Partial<IStaff>) {
+  async update(id: string, data: any) {
     try {
-      const IsExist = await this.find({ id: id });
+      const IsExist = await this.find({ id });
 
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.STAFF.STAFF_ID_NOT_VALID);
       }
+
+      if (data.group) {
+        const group = await this.groupRepository.findOne({ where: { id: data.group } });
+        if (!group) {
+          return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
+        }
+        data.group = group;
+      }
+
       const {branchs} =data
       delete data.branchs
       let result = await this.staffRepository.update(id,data );
@@ -230,6 +242,7 @@ this.customErrorHandle(error);
       const qr = this.staffRepository.createQueryBuilder('staff');
       qr.leftJoinAndSelect('staff.role', 'role');
       qr.leftJoin('staff.branchs', 'branchs');
+      qr.leftJoinAndSelect('staff.group', 'group');
 
       qr.select([
         'staff.id',
@@ -239,6 +252,7 @@ this.customErrorHandle(error);
         'staff.staffId',
         'staff.phone',
         'staff.status',
+         'group.name',
          'branchs'
       ]);
       if (sort) {
@@ -308,7 +322,6 @@ this.customErrorHandle(error);
   }
 
   async  getAllEmployeesUnderManager(managerId: string): Promise<any> {
-
     const manager = await this.staffRepository.findOne({ where: { id: managerId } });
         if (!manager) {
             throw new Error(`Manager with ID ${managerId} not found.`);
@@ -318,6 +331,7 @@ this.customErrorHandle(error);
          let employeesTree:Staff[] =  StaffUtil.employeeTree(employees)
         return employeesTree;
 }
+
   async getStaffByBranchId(branchId: string) {
     try{
       return this.staffRepository

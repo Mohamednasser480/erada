@@ -8,12 +8,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Branch } from './branch/branch.entity';
+import { Group } from '../group/group.entity';
 import { BranchModule } from './branch/branch.module';
 @Module({
   imports: [
     CacheModule.register({ host: '127.0.0.1', port: 6379, db: 0, ttl: 100000 }),
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([Staff,Branch, Role]),
+    TypeOrmModule.forFeature([Staff,Branch, Role, Group]),
     AuthModule,
     BranchModule,
   ],

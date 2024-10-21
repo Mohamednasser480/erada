@@ -6,14 +6,18 @@ import { RESPONSE_MESSAGES } from '../types/responseMessages';
 import { AuthService } from 'src/auth/auth.service';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-import { GroupRepository } from './group.repository'; // Import the custom repository
+import { GroupRepository } from './group.repository';
+import { Repository } from 'typeorm';
+import { Staff } from '../staff/staff.entity';
 
 export const allowedFieldsToSort = ['name'];
 
 @Injectable({ scope: Scope.REQUEST })
 export class GroupService extends BaseService {
   constructor(
-    private readonly groupRepository: GroupRepository, // Inject custom repository
+    private readonly groupRepository: GroupRepository,
+    @InjectRepository(Staff)
+    private readonly staffRepository: Repository<Staff>,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     @Inject(REQUEST) private readonly request: Request,
@@ -79,23 +83,43 @@ export class GroupService extends BaseService {
   async findAll(data: any) {
     try {
       const { search, group, sort, limit = 10, page = 1 } = data;
-      const qr = this.groupRepository.createQueryBuilder('group');
-      qr.select(['group.id', 'group.name', 'group.isActive']);
 
+      const qr = this.groupRepository.createQueryBuilder('group').select([
+            'group.id',
+            'group.name',
+            'group.isActive',
+            'group.createdAt'
+          ])
       if (sort) {
         const [sortField, sortOrder] = this.buildSortParams<{ name: string }>(sort);
         if (allowedFieldsToSort.includes(sortField)) {
           qr.orderBy(`group.${sortField}`, sortOrder);
         }
       }
+
+      // Filter by group name
       if (group) {
         qr.andWhere('group.name LIKE :group', { group: `%${group}%` });
       }
+
+      // Search functionality
       if (search) {
         qr.andWhere('group.name LIKE :search', { search: `%${search}%` });
       }
-
-      return await this._paginate<IGroup>(qr, { limit, page });
+      const groups: any = await this._paginate<IGroup>(qr, { limit, page });
+      const staffCountsForEachGroup = await this.staffRepository
+          .createQueryBuilder('staff')
+          .select('group.name', 'groupName')
+          .addSelect('COUNT(staff.id)', 'staffCount')
+          .leftJoin('staff.group', 'group')
+          .groupBy('group.name')
+          .getRawMany();
+      groups.items.forEach( (group: any) => {
+        const index = staffCountsForEachGroup.findIndex(record => record.groupName == group.name);
+        if(index !== -1)
+          group.staffCount = staffCountsForEachGroup[index].staffCount;
+      })
+      return groups;
     } catch (err) {
       console.error('Error finding groups:', err);
       return this._getInternalServerError(err.message);

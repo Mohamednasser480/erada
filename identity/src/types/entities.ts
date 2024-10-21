@@ -30,6 +30,7 @@ export interface IStaff extends IBaseWithId {
   branchs?: string[];
   oldPassword?: string;
   newPassword?: string;
+  group?: string;
 }
 
 export interface ISidebar extends IBaseWithId {
