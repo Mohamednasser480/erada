@@ -15,6 +15,10 @@ export class Staff extends BaseEntityWithId implements IStaff {
   @Column({ type: 'varchar', length: 100, nullable: false })
   name: string;
 
+  @ApiProperty({ description: 'last name' })
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  lastName: string;
+
   @ApiProperty({ description: 'name' })
   @Column({ type: 'varchar', length: 100, nullable: false })
   staffId: string;
@@ -22,6 +26,14 @@ export class Staff extends BaseEntityWithId implements IStaff {
   @ApiProperty({ description: 'Phone number' })
   @Column({ type: 'varchar', length: 15, nullable: false })
   phone: number;
+
+  @ApiProperty({ description: 'email' })
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  email: string;
+
+  @ApiProperty({ description: 'national id' })
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  nationalId: string;
 
   @ApiProperty({ description: 'Staff Password ' })
   @Column({ type: 'varchar', length: 100, nullable: false })

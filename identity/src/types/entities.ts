@@ -20,10 +20,13 @@ export interface IBaseWithMeta extends IBaseWithId {
 }
 export interface IStaff extends IBaseWithId {
   name: string;
+  lastName: string;
   staffId: string;
   password: string;
   phone: number;
   status: boolean;
+  nationalId: string;
+  email: string;
   refreshToken?: string;
   manager?: any;
   role: string;

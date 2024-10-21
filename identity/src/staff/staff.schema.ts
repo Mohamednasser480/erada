@@ -5,6 +5,9 @@ export const staffValidationSchema: {
   [key in keyof IStaff]?: yup.AnySchema;
 } = {
   name: yup.string().required(),
+  lastName: yup.string().required(),
+  nationalId: yup.string().required(),
+  email: yup.string().email().required(),
   staffId: yup.string().required('Please enter valid staff ID').required(),
   password: yup.string().required(),
   phone: yup
@@ -14,7 +17,8 @@ export const staffValidationSchema: {
   status: yup.boolean().default(true),
   role: yup.string(),
   branchs: yup.array(),
-  group: yup.string()
+  group: yup.string(),
+
 };
 
 export const findValidationSchema: {

@@ -213,25 +213,26 @@ this.customErrorHandle(error);
           .leftJoinAndSelect('permission.sidebar', 'sidebar')
           .where('staff.id = :id', { id })
           .getOne();
-      staff.role.permission = staff.role.permission.reduce((acc: any, item: any) => {
-        const sidebarName = item.sidebar.name;
-        const actionName = item.action.name;
+      if(staff.role)
+        staff.role.permission = staff?.role?.permission?.reduce((acc: any, item: any) => {
+          const sidebarName = item.sidebar.name;
+          const actionName = item.action.name;
 
-        if (!acc[sidebarName]) {
-          acc[sidebarName] = [];
-        }
-        if (actionName) {
-          acc[sidebarName].push(actionName);
-        }
-        return acc;
-      }, {});
+          if (!acc[sidebarName]) {
+            acc[sidebarName] = [];
+          }
+          if (actionName) {
+            acc[sidebarName].push(actionName);
+          }
+          return acc;
+        }, {});
 
-      if (staff) {
+        if (staff) {
         await this.cacheService.set(`staff_${id}`, staff);
         const cachedData = await this.cacheService.get(id.toString());
         console.log('data set to cache', cachedData);
       }
-
+      delete staff.password;
       return staff;
     } catch (err) {
       return this._getInternalServerError(err.message);
