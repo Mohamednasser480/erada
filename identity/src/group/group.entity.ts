@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { BaseEntityWithId } from '../abstract';
-import { IGroup, IRole } from '../types';
+import { IGroup } from '../types';
 import { Column, Entity, OneToMany, JoinColumn } from 'typeorm';
 import { Staff } from 'src/staff/staff.entity';
 
@@ -15,4 +14,4 @@ export class Group extends BaseEntityWithId implements IGroup {
   @OneToMany(() => Staff, (staff) => staff.group, {onUpdate: 'CASCADE'})
   @JoinColumn()
   staff: string;
- }
+}

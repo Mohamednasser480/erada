@@ -30,7 +30,7 @@ export class StaffService extends BaseService {
     super();
   }
 
-  async create(data: any) {
+  async create(data: Partial<IStaff>) {
     const { staffId, password,branchs } = data;
     try {
       const IsExist = await this.find({ staffId: staffId });
@@ -74,20 +74,12 @@ export class StaffService extends BaseService {
    * @returns {dataObject}
    * @description :This function is used to update staff
    */
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<IStaff>) {
     try {
       const IsExist = await this.find({ id });
 
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.STAFF.STAFF_ID_NOT_VALID);
-      }
-
-      if (data.group) {
-        const group = await this.groupRepository.findOne({ where: { id: data.group } });
-        if (!group) {
-          return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
-        }
-        data.group = group;
       }
 
       const {branchs} =data

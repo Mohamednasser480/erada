@@ -6,21 +6,18 @@ import { RESPONSE_MESSAGES } from '../types/responseMessages';
 import { AuthService } from 'src/auth/auth.service';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-import { GroupRepository } from './group.repository';
 import { Repository } from 'typeorm';
 import { Staff } from '../staff/staff.entity';
-
+import {Group} from "./group.entity";
 export const allowedFieldsToSort = ['name'];
 
 @Injectable({ scope: Scope.REQUEST })
 export class GroupService extends BaseService {
   constructor(
-    private readonly groupRepository: GroupRepository,
+    @InjectRepository(Group)
+    private readonly groupRepository: Repository<Group>,
     @InjectRepository(Staff)
     private readonly staffRepository: Repository<Staff>,
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
-    @Inject(REQUEST) private readonly request: Request,
   ) {
     super();
   }
@@ -28,12 +25,15 @@ export class GroupService extends BaseService {
   async create(data: Partial<IGroup>) {
     const { name } = data;
     try {
-      const IsExist = await this.groupRepository.findOneEntity({ name });
+      const IsExist = await this.find({ name });
       if (IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_IS_ALREADY_EXIST);
       }
-      return await this.groupRepository.createEntity(data);
+
+      const created = this.groupRepository.create(data);
+      return this.groupRepository.save(created);
     } catch (error) {
+      console.log(error);
       return this._getBadRequestError(error.message);
     }
   }
@@ -41,20 +41,17 @@ export class GroupService extends BaseService {
   async update(id: string, data: Partial<IGroup>) {
     try {
       const { name } = data;
-      const IsExist = await this.groupRepository.findOneEntity({ id });
-
+      const IsExist = await this.find({ id });
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
       }
-
       if (name !== IsExist?.name) {
-        const isNameExist = await this.groupRepository.findOneEntity({ name });
+        const isNameExist = await this.find({ name });
         if (isNameExist) {
           return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_NAME_IS_ALREADY_EXIST);
         }
       }
-
-      const updatedGroup = await this.groupRepository.updateEntity(id, data);
+      const updatedGroup = await this.groupRepository.update(id, data);
       return {
         message: RESPONSE_MESSAGES.GROUP.GROUP_UPDATED_SUCCESSFULLY,
         data: updatedGroup,
@@ -66,12 +63,12 @@ export class GroupService extends BaseService {
 
   async updateStatus(id: string, data: Partial<IGroup>) {
     try {
-      const IsExist = await this.groupRepository.findOneEntity({ id });
+      const IsExist = await this.find({ id });
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
       }
 
-      await this.groupRepository.updateEntity(id, data);
+      await this.groupRepository.update(id, data);
       return {
         message: RESPONSE_MESSAGES.GROUP.GROUP_STATUS_UPDATED,
       };
@@ -106,7 +103,7 @@ export class GroupService extends BaseService {
       if (search) {
         qr.andWhere('group.name LIKE :search', { search: `%${search}%` });
       }
-      const groups: any = await this._paginate<IGroup>(qr, { limit, page });
+      const groups = await this._paginate<IGroup>(qr, { limit, page });
       const staffCountsForEachGroup = await this.staffRepository
           .createQueryBuilder('staff')
           .select('group.name', 'groupName')
@@ -128,7 +125,7 @@ export class GroupService extends BaseService {
 
   async findById(id: string) {
     try {
-      const exists = await this.groupRepository.findOneEntity({ id });
+      const exists = await this.find({ id });
       if (!exists) {
         return this._getInternalServerError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
       }
@@ -140,16 +137,26 @@ export class GroupService extends BaseService {
 
   async delete(id: string) {
     try {
-      const IsExist = await this.groupRepository.findOneEntity({ id });
+      const IsExist = await this.find({ id });
       if (!IsExist) {
         return this._getNotFoundError(RESPONSE_MESSAGES.GROUP.GROUP_ID_IS_NOT_VALID);
       }
-      await this.groupRepository.deleteEntity(id);
+      await this.groupRepository.delete(id);
       return {
         message: RESPONSE_MESSAGES.GROUP.GROUP_DELETED_SUCCESSFULLY,
       };
     } catch (error) {
       return this._getInternalServerError(error.message);
+    }
+  }
+
+  async find(dataObject: object) {
+    try {
+      return await this.groupRepository.findOne({
+        where: dataObject,
+      });
+    } catch (err) {
+      return this._getInternalServerError(err.message);
     }
   }
 }

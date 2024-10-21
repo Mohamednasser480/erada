@@ -23,8 +23,8 @@ export abstract class BaseEntity {
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
-})
-createdAt: string;
+  })
+  createdAt: string;
 }
 
 export abstract class BaseEntityWithId extends BaseEntity {

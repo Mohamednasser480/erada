@@ -7,7 +7,6 @@ import { Group } from './group.entity';
 import { Staff } from '../staff/staff.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { StaffModule } from 'src/staff/staff.module';
-import { GroupRepository } from 'src/group/group.repository'
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -16,7 +15,7 @@ import { GroupRepository } from 'src/group/group.repository'
     forwardRef(() => StaffModule),
   ],
   controllers: [GroupController],
-  providers: [GroupService, GroupRepository],
+  providers: [GroupService],
   exports: [],
 })
 export class GroupModule {}
